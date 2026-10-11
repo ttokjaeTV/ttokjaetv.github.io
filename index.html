@@ -15,6 +15,25 @@
 <meta property="og:locale" content="ko_KR">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#F5EFE6">
+<!-- PREVIEW-LOCK START (head) : 정식 공개 때 이 블록과 body 끝의 PREVIEW-LOCK 블록을 지운다 -->
+<meta name="robots" content="noindex, nofollow">
+<script>document.documentElement.classList.add('pv-locked');</script>
+<style>
+  html.pv-locked, html.pv-locked body { overflow: hidden; }
+  html.pv-locked body > *:not(#pv-gate) { visibility: hidden; }
+  #pv-gate { position: fixed; inset: 0; z-index: 9999; background: #F5EFE6; display: flex; align-items: center; justify-content: center; padding: 24px 16px; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+  html:not(.pv-locked) #pv-gate { display: none; }
+  #pv-gate .pv-card { width: 100%; max-width: 400px; background: #FBF7F0; border: 1px solid #E5DCC8; border-radius: 20px; padding: 30px 26px; box-shadow: 0 18px 40px -24px rgba(58,47,38,.35); }
+  #pv-gate .pv-tag { display: inline-block; font-size: 12px; font-weight: 800; color: #D9542B; border: 1.5px solid #D9542B; border-radius: 999px; padding: 5px 12px; margin-bottom: 14px; }
+  #pv-gate h1 { font-size: 22px; font-weight: 900; letter-spacing: -.5px; line-height: 1.4; margin: 0 0 8px; color: #1A1A1A; }
+  #pv-gate p { font-size: 14px; font-weight: 500; color: #4A4A4A; line-height: 1.7; margin: 0 0 18px; }
+  #pv-gate form { display: flex; gap: 8px; }
+  #pv-gate input { flex: 1; min-width: 0; font: inherit; font-size: 16px; font-weight: 700; border: 1.5px solid #E5DCC8; border-radius: 10px; padding: 12px; background: #fff; color: #1A1A1A; }
+  #pv-gate input:focus { outline: none; border-color: #D9542B; box-shadow: 0 0 0 3px #F4D5C4; }
+  #pv-gate button { font: inherit; font-size: 15px; font-weight: 800; color: #FBF7F0; background: #3A2F26; border: 0; border-radius: 10px; padding: 0 18px; cursor: pointer; }
+  #pv-gate .pv-msg { min-height: 20px; margin-top: 10px; font-size: 13px; font-weight: 700; color: #A03D1F; }
+</style>
+<!-- PREVIEW-LOCK END (head) -->
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%233A2F26'/><text x='32' y='44' font-size='34' font-weight='900' text-anchor='middle' fill='%23FBF7F0' font-family='sans-serif'>똑</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
 <script type="application/ld+json">
@@ -572,5 +591,42 @@
   input.addEventListener('input', apply);
 })();
 </script>
+<!-- PREVIEW-LOCK START (body) -->
+<div id="pv-gate" role="dialog" aria-modal="true">
+  <div class="pv-card">
+    <span class="pv-tag">공개 준비 중</span>
+    <h1>똑재TV 투자 계산기 모음<br>미리보기</h1>
+    <p>정식 공개 전 미리보기 페이지입니다. 비밀번호를 입력해 주세요.</p>
+    <form id="pv-form" autocomplete="off"><input id="pv-input" type="password" placeholder="비밀번호" aria-label="비밀번호"><button type="submit">열기</button></form>
+    <div class="pv-msg" id="pv-msg" aria-live="polite"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var V = 'ft0cRq8BjrfCGrHglfV/+ieTIYnZWgmBcBhFVuiFDtc=', SALT = 'ttokjae-hub-preview-v1', KEY = 'ttokjae-hub-preview';
+  var root = document.documentElement, enc = new TextEncoder();
+  function b64(buf) { var s = '', a = new Uint8Array(buf); for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s); }
+  function check(pw) {
+    return crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveBits'])
+      .then(function (k) { return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: enc.encode(SALT), iterations: 100000 }, k, 256); })
+      .then(function (bits) { return b64(bits) === V; });
+  }
+  function open() { root.classList.remove('pv-locked'); }
+  var saved = null; try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (saved) check(saved).then(function (ok) { if (ok) open(); else { try { localStorage.removeItem(KEY); } catch (e) {} } });
+  var form = document.getElementById('pv-form'), input = document.getElementById('pv-input'), msg = document.getElementById('pv-msg');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var pw = input.value.trim();
+    if (!pw) return;
+    check(pw).then(function (ok) {
+      if (ok) { try { localStorage.setItem(KEY, pw); } catch (e) {} open(); }
+      else { msg.textContent = '비밀번호가 맞지 않습니다.'; input.select(); }
+    }).catch(function () { msg.textContent = '이 브라우저에서는 열 수 없습니다. 최신 크롬으로 열어 주세요.'; });
+  });
+  if (!saved) setTimeout(function () { try { input.focus(); } catch (e) {} }, 50);
+})();
+</script>
+<!-- PREVIEW-LOCK END (body) -->
 </body>
 </html>

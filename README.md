@@ -1,5 +1,8 @@
 # 똑재TV 투자 계산기 모음 (허브 페이지)
 
+> **지금은 공개 전 미리보기 상태**: `index.html` 에 미리보기 비밀번호 화면(PREVIEW-LOCK)과 `noindex` 가 들어 있다.
+> 정식 공개 때 `PREVIEW-LOCK START` ~ `PREVIEW-LOCK END` 블록 두 곳(head·body 끝)을 지우고 올린 뒤, 서치콘솔에 sitemap 을 제출한다.
+
 `https://ttokjaetv.github.io/` 루트에 뜨는 허브 페이지. ttokjaeTV 조직에 배포된 계산기·트래커·비교표를 주제별로 묶어 보여준다.
 
 ## 파일
