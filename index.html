@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>똑재TV 투자 계산기 모음 - 노후자금·연금 세금·배당·ISA 무료 계산기</title>
+<meta name="description" content="은퇴자금 역산, 연금 인출 세금, ISA 만기 전략, 배당 재투자, 월배당 ETF 트래커, 증권사 수수료 비교까지. 노후 준비에 필요한 무료 투자 계산기 15종을 한곳에 모았습니다.">
+<meta name="keywords" content="투자 계산기, 노후자금 계산기, 은퇴자금 계산기, 연금 세금 계산기, ISA 만기, 배당 재투자 계산기, 월배당 ETF, 증권사 수수료 비교, CMA 금리 비교">
+<link rel="canonical" href="https://ttokjaetv.github.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="똑재TV 계산기">
+<meta property="og:title" content="똑재TV 투자 계산기 모음 - 노후 준비 무료 계산기 15종">
+<meta property="og:description" content="은퇴자금 역산, 연금 인출 세금, ISA 만기 전략, 배당 재투자, 증권사 수수료 비교까지 한곳에서.">
+<meta property="og:url" content="https://ttokjaetv.github.io/">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#F5EFE6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%233A2F26'/><text x='32' y='44' font-size='34' font-weight='900' text-anchor='middle' fill='%23FBF7F0' font-family='sans-serif'>똑</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "똑재TV 투자 계산기 모음",
+  "url": "https://ttokjaetv.github.io/",
+  "inLanguage": "ko",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {"@type":"ListItem","position":1,"name":"은퇴 5년 전 점검 가이드","url":"https://ttokjaetv.github.io/retire-check/"},
+      {"@type":"ListItem","position":2,"name":"평생 월 300만원 현금흐름 역산 계산기","url":"https://ttokjaetv.github.io/retirement/"},
+      {"@type":"ListItem","position":3,"name":"목표금액 계산기","url":"https://ttokjaetv.github.io/goal-calc/"},
+      {"@type":"ListItem","position":4,"name":"연금 인출 세금 시뮬레이터","url":"https://ttokjaetv.github.io/pension-tax-sim/"},
+      {"@type":"ListItem","position":5,"name":"ISA 만기 전략 계산기","url":"https://ttokjaetv.github.io/isa-maturity/"},
+      {"@type":"ListItem","position":6,"name":"ETF 계좌 추천 도구","url":"https://ttokjaetv.github.io/etf-selector/"},
+      {"@type":"ListItem","position":7,"name":"배당 재투자 계산기","url":"https://ttokjaetv.github.io/rediv/"},
+      {"@type":"ListItem","position":8,"name":"배당 눈덩이 시뮬레이터","url":"https://ttokjaetv.github.io/ttokjae-div/"},
+      {"@type":"ListItem","position":9,"name":"국내 상장 월배당 ETF 트래커","url":"https://ttokjaetv.github.io/montly-div/"},
+      {"@type":"ListItem","position":10,"name":"SCHD 배당 트래커","url":"https://ttokjaetv.github.io/schd-tracker/"},
+      {"@type":"ListItem","position":11,"name":"포트폴리오 관리 도구","url":"https://ttokjaetv.github.io/portfolio-sheet-data/"},
+      {"@type":"ListItem","position":12,"name":"하락장 물타기 계산기","url":"https://ttokjaetv.github.io/Water-Calc/"},
+      {"@type":"ListItem","position":13,"name":"증권사 수수료 비교표","url":"https://ttokjaetv.github.io/trading-fee/"},
+      {"@type":"ListItem","position":14,"name":"증권사 절세계좌 수수료 비교표","url":"https://ttokjaetv.github.io/tax-account-compare/"},
+      {"@type":"ListItem","position":15,"name":"증권사 CMA 금리 비교","url":"https://ttokjaetv.github.io/cma-compare/"}
+    ]
+  }
+}
+</script>
+<style>
+  :root {
+    --bg: #F5EFE6;
+    --bg-alt: #EFE7DA;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --ink-mute: #8B8276;
+    --accent: #D9542B;
+    --accent-soft: #F4D5C4;
+    --border: #E5DCC8;
+    --white: #FBF7F0;
+    --brown: #8B6F47;
+    --beige-gold: #C4A57B;
+    --dark-warm: #3A2F26;
+    --dark-warm-soft: #5A4A3D;
+    --green: #4A5A4A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 32px 24px;
+    font-weight: 600;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* 헤더 */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon {
+    width: 40px; height: 40px; background: var(--dark-warm); color: var(--white);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 20px;
+  }
+  .logo-name { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 10px; color: var(--ink-mute); font-weight: 700; letter-spacing: 1px; }
+  .head-count { font-size: 12px; font-weight: 700; color: var(--ink-mute); }
+  .head-count b { color: var(--accent); font-weight: 900; }
+
+  /* 히어로 */
+  .hero { margin-bottom: 32px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--white); border: 1.5px solid var(--accent); color: var(--accent);
+    padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+  .tag .dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+  .hero-title { font-size: 64px; font-weight: 900; letter-spacing: -2.5px; line-height: 1.05; margin-bottom: 20px; }
+  .underline-mark { background: linear-gradient(transparent 60%, var(--accent-soft) 60%); padding: 0 4px; }
+  .hero-desc { font-size: 17px; color: var(--ink-soft); font-weight: 500; line-height: 1.7; }
+
+  /* 상단 CTA */
+  .top-cta {
+    background: var(--bg-alt); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px 24px; margin-bottom: 40px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .top-cta-text { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+  .cta-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .cta-link {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px;
+    font-size: 13px; font-weight: 700; text-decoration: none;
+    background: var(--white); border: 1.5px solid var(--border); color: var(--ink);
+  }
+  .cta-link.primary { background: var(--accent); color: var(--white); border-color: var(--accent); }
+  .naver-mark {
+    display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px;
+    background: #03C75A; color: #FFFFFF; font-weight: 900; font-size: 11px; border-radius: 3px;
+    line-height: 1; letter-spacing: -0.5px; flex-shrink: 0;
+  }
+
+  /* 섹션 라벨 */
+  .step-label { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .step-line { width: 28px; height: 2px; background: var(--accent); }
+  .step-text { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--accent); }
+  .sec-title { font-size: 26px; font-weight: 900; letter-spacing: -0.6px; margin-bottom: 6px; }
+  .sec-sub { font-size: 14px; color: var(--ink-mute); font-weight: 500; margin-bottom: 20px; line-height: 1.6; }
+
+  /* 빠른 찾기 */
+  .quick { margin-bottom: 48px; }
+  .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .quick-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--white); border: 1.5px solid var(--border); border-radius: 14px;
+    padding: 16px 18px; text-decoration: none; transition: all 0.15s ease;
+  }
+  .quick-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .quick-q { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.4; }
+  .quick-to { display: block; font-size: 12px; font-weight: 600; color: var(--ink-mute); margin-top: 3px; }
+  .quick-arrow { color: var(--accent); font-weight: 900; font-size: 18px; flex-shrink: 0; }
+
+  /* 필터 */
+  .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .search-wrap { position: relative; flex: 1 1 260px; max-width: 360px; }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--ink-mute); }
+  #search {
+    width: 100%; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 12px 14px 12px 40px; font-family: inherit; font-size: 15px; color: var(--ink); font-weight: 700;
+  }
+  #search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+    padding: 9px 14px; border-radius: 999px; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--ink-soft); transition: all 0.15s ease;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.active { background: var(--dark-warm); border-color: var(--dark-warm); color: var(--white); }
+
+  /* 카테고리 블록 */
+  .cat { margin-bottom: 40px; }
+  .cat-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid var(--border); }
+  .cat-num { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--accent); }
+  .cat-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+  .cat-desc { font-size: 13px; font-weight: 500; color: var(--ink-mute); margin-left: auto; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  /* 도구 카드 */
+  .tool {
+    position: relative; display: flex; flex-direction: column;
+    background: var(--white); border: 1.5px solid var(--border); border-radius: 20px;
+    padding: 24px; text-decoration: none; transition: all 0.15s ease; min-height: 210px;
+  }
+  .tool:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 24px -14px rgba(58,47,38,0.35); }
+  .tool-top { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .kind { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--ink-mute); }
+  .badge { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.3px; }
+  .badge.new { background: var(--accent); color: var(--white); }
+  .badge.pick { background: var(--dark-warm); color: var(--white); }
+  .badge.auto { background: #E3E8DF; color: var(--green); }
+  .tool-q { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 4px; letter-spacing: -0.2px; }
+  .tool-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.3; margin-bottom: 10px; }
+  .tool-desc { font-size: 14px; font-weight: 500; color: var(--ink-soft); line-height: 1.6; flex: 1; }
+  .tool-go { margin-top: 18px; font-size: 13px; font-weight: 800; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+  .tool:hover .tool-go { color: var(--accent); }
+  .tool.featured { background: var(--dark-warm); border-color: var(--dark-warm); color: var(--white); }
+  .tool.featured .kind { color: var(--beige-gold); }
+  .tool.featured .tool-q { color: #F2A27F; }
+  .tool.featured .tool-desc { color: #D9D2C5; }
+  .tool.featured .tool-go { color: var(--white); }
+  .tool.featured .badge.pick { background: var(--accent); }
+  .tool.featured:hover { border-color: var(--accent); }
+
+  .empty { display: none; text-align: center; padding: 48px 20px; color: var(--ink-mute); font-size: 15px; font-weight: 600; background: var(--white); border: 1.5px dashed var(--border); border-radius: 20px; margin-bottom: 40px; }
+
+  /* FAQ */
+  .faq { margin: 16px 0 40px; }
+  .faq details { background: var(--white); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 10px; }
+  .faq summary { cursor: pointer; padding: 18px 20px; font-size: 16px; font-weight: 800; letter-spacing: -0.3px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: var(--accent); font-weight: 900; font-size: 20px; line-height: 1; }
+  .faq details[open] summary::after { content: '−'; }
+  .faq p { padding: 0 20px 18px; font-size: 14px; font-weight: 500; color: var(--ink-soft); line-height: 1.7; }
+
+  /* 인사이트(하단 CTA) */
+  .insight-box { background: var(--dark-warm); color: var(--white); border-radius: 20px; padding: 32px; margin-bottom: 32px; }
+  .insight-label { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .insight-label-text { font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--accent); }
+  .insight-title { font-size: 24px; font-weight: 900; letter-spacing: -0.6px; line-height: 1.4; margin-bottom: 10px; }
+  .insight-desc { font-size: 15px; font-weight: 500; color: #D9D2C5; line-height: 1.7; margin-bottom: 22px; }
+  .insight-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-top: 20px; border-top: 1px solid var(--dark-warm-soft); }
+  .insight-cta-text { font-size: 14px; color: #D9D2C5; font-weight: 600; }
+  .insight-box .cta-link.secondary { background: transparent; color: var(--white); border-color: var(--dark-warm-soft); }
+
+  footer { font-size: 12px; color: var(--ink-mute); font-weight: 500; line-height: 1.8; padding-top: 20px; border-top: 1px solid var(--border); }
+
+  @media (max-width: 1000px) {
+    .grid, .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    body { padding: 20px 16px; }
+    header { margin-bottom: 24px; }
+    .hero-title { font-size: 34px; letter-spacing: -1.2px; line-height: 1.18; }
+    .hero-desc { font-size: 15px; }
+    .hero-desc br { display: none; }
+    .top-cta { padding: 16px; margin-bottom: 32px; }
+    .grid, .quick-grid { grid-template-columns: 1fr; }
+    .sec-title { font-size: 22px; }
+    .cat-desc { display: none; }
+    .tool { min-height: 0; padding: 20px; }
+    .search-wrap { max-width: none; flex-basis: 100%; }
+    .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex-shrink: 0; }
+    .insight-box { padding: 24px 20px; }
+    .insight-title { font-size: 20px; }
+  }
+  @media (max-width: 380px) {
+    .hero-title { font-size: 29px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <a class="logo" href="https://ttokjaetv.github.io/">
+      <div class="logo-icon">똑</div>
+      <div>
+        <div class="logo-name">똑재TV</div>
+        <div class="logo-sub">INVESTMENT CALCULATORS</div>
+      </div>
+    </a>
+    <div class="head-count">무료 도구 <b>15</b>종</div>
+  </header>
+
+  <div class="hero">
+    <span class="tag"><span class="dot"></span>똑재TV 투자 계산기 모음</span>
+    <h1 class="hero-title">
+      노후 준비,<br>
+      <span class="underline-mark">감이 아니라 숫자로</span> 확인하세요
+    </h1>
+    <p class="hero-desc">
+      은퇴자금 역산부터 연금 꺼낼 때 세금, ISA 만기 전략, 배당 재투자, 증권사 수수료 비교까지.<br>
+      설치도 로그인도 없이, 숫자만 넣으면 바로 계산됩니다.
+    </p>
+  </div>
+
+  <div class="top-cta">
+    <div class="top-cta-text">💡 계산기 사용법과 숫자 해석은 <strong>똑재TV 영상</strong>에서 자세히 다룹니다.</div>
+    <div class="cta-links">
+      <a href="https://www.youtube.com/@ttok_jae" target="_blank" rel="noopener" class="cta-link primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        똑재TV 구독하기
+      </a>
+      <a href="https://cafe.naver.com/ttokjae" target="_blank" rel="noopener" class="cta-link">
+        <span class="naver-mark">N</span>
+        평생 ETF 투자 카페
+      </a>
+    </div>
+  </div>
+
+  <!-- 빠른 찾기 -->
+  <section class="quick" aria-labelledby="quick-title">
+    <div class="step-label"><div class="step-line"></div><span class="step-text">QUICK START</span></div>
+    <h2 class="sec-title" id="quick-title">어떤 게 궁금하세요?</h2>
+    <p class="sec-sub">질문을 누르면 딱 맞는 계산기로 바로 이동합니다.</p>
+    <div class="quick-grid">
+      <a class="quick-item" href="https://ttokjaetv.github.io/retirement/">
+        <span><span class="quick-q">은퇴하려면 돈이 얼마나 있어야 할까?</span><span class="quick-to">현금흐름 역산 계산기</span></span><span class="quick-arrow">→</span>
+      </a>
+      <a class="quick-item" href="https://ttokjaetv.github.io/pension-tax-sim/">
+        <span><span class="quick-q">연금 꺼낼 때 세금은 얼마나 떼일까?</span><span class="quick-to">연금 인출 세금 시뮬레이터</span></span><span class="quick-arrow">→</span>
+      </a>
+      <a class="quick-item" href="https://ttokjaetv.github.io/etf-selector/">
+        <span><span class="quick-q">이 ETF, 어느 계좌에서 사야 할까?</span><span class="quick-to">ETF 계좌 추천 도구</span></span><span class="quick-arrow">→</span>
+      </a>
+      <a class="quick-item" href="https://ttokjaetv.github.io/ttokjae-div/">
+        <span><span class="quick-q">배당으로 월 100만원, 언제쯤 될까?</span><span class="quick-to">배당 눈덩이 시뮬레이터</span></span><span class="quick-arrow">→</span>
+      </a>
+      <a class="quick-item" href="https://ttokjaetv.github.io/isa-maturity/">
+        <span><span class="quick-q">ISA 만기 되면 연금으로 옮겨야 할까?</span><span class="quick-to">ISA 만기 전략 계산기</span></span><span class="quick-arrow">→</span>
+      </a>
+      <a class="quick-item" href="https://ttokjaetv.github.io/trading-fee/">
+        <span><span class="quick-q">수수료 싼 증권사는 어디일까?</span><span class="quick-to">증권사 수수료 비교표</span></span><span class="quick-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 전체 목록 -->
+  <section aria-labelledby="all-title">
+    <div class="step-label"><div class="step-line"></div><span class="step-text">ALL TOOLS</span></div>
+    <h2 class="sec-title" id="all-title">전체 계산기</h2>
+    <p class="sec-sub">주제별로 골라 보거나 검색하세요.</p>
+
+    <div class="toolbar">
+      <label class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="search" type="search" placeholder="예: 연금, ISA, 배당, 수수료" aria-label="계산기 검색" autocomplete="off">
+      </label>
+      <div class="chips" role="tablist" aria-label="주제 필터">
+        <button class="chip active" data-cat="all" role="tab">전체</button>
+        <button class="chip" data-cat="retire" role="tab">노후 설계</button>
+        <button class="chip" data-cat="pension" role="tab">연금·절세계좌</button>
+        <button class="chip" data-cat="dividend" role="tab">배당</button>
+        <button class="chip" data-cat="etf" role="tab">ETF·포트폴리오</button>
+        <button class="chip" data-cat="broker" role="tab">증권사 비교</button>
+      </div>
+    </div>
+
+    <!-- 01 노후 설계 -->
+    <div class="cat" data-cat="retire">
+      <div class="cat-head"><span class="cat-num">01</span><h3 class="cat-title">노후 설계</h3><span class="cat-desc">얼마가 필요하고, 얼마씩 모아야 할까</span></div>
+      <div class="grid">
+        <a class="tool featured" href="https://ttokjaetv.github.io/retire-check/" data-k="은퇴 5년 전 점검 가이드 소득공백 국민연금 수령시기 연금 인출 순서 1500만원 ISA 만기 건보료 피부양자 체크리스트">
+          <div class="tool-top"><span class="kind">STEP GUIDE</span><span class="badge pick">여기서 시작</span></div>
+          <div class="tool-q">은퇴까지 5년, 뭘 점검해야 할까?</div>
+          <div class="tool-name">은퇴 5년 전 점검 가이드</div>
+          <div class="tool-desc">소득 공백기, 국민연금 수령 시기, 연금 인출 순서, 연 1,500만원 기준, ISA 만기, 건보료 피부양자까지 6단계로 점검합니다.</div>
+          <div class="tool-go">점검 시작하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/retirement/" data-k="은퇴 역산 계산기 월 300만원 현금흐름 노후자금 필요자산 4% 룰 인플레이션 FIRE 은퇴자금">
+          <div class="tool-top"><span class="kind">CALCULATOR</span></div>
+          <div class="tool-q">월 300만원 쓰려면 얼마가 필요할까?</div>
+          <div class="tool-name">평생 월 300만원 현금흐름 역산 계산기</div>
+          <div class="tool-desc">은퇴 후 필요한 월 생활비를 넣으면 모아야 할 자산과 매달 적립금을 역산합니다. 종목 비중 조합별 필요 원금도 비교합니다.</div>
+          <div class="tool-go">계산하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/goal-calc/" data-k="목표금액 계산기 월 적립액 달성 기간 만기 금액 물가 반영 수익률 시나리오 복리 적립식">
+          <div class="tool-top"><span class="kind">CALCULATOR</span><span class="badge new">NEW</span></div>
+          <div class="tool-q">목표한 그 돈, 매달 얼마씩 몇 년이면 될까?</div>
+          <div class="tool-name">목표금액 계산기</div>
+          <div class="tool-desc">필요한 월 적립액, 걸리는 기간, 지금 계획대로면 모이는 금액을 한 번에. 물가 반영과 수익률별 차이까지 보여줍니다.</div>
+          <div class="tool-go">계산하기 →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 02 연금·절세계좌 -->
+    <div class="cat" data-cat="pension">
+      <div class="cat-head"><span class="cat-num">02</span><h3 class="cat-title">연금·절세계좌</h3><span class="cat-desc">연금저축·IRP·ISA를 어떻게 쓰고 꺼낼까</span></div>
+      <div class="grid">
+        <a class="tool" href="https://ttokjaetv.github.io/pension-tax-sim/" data-k="연금 인출 세금 시뮬레이터 연금저축 IRP 퇴직금 연금소득세 1500만원 분리과세 종합과세 세액공제">
+          <div class="tool-top"><span class="kind">SIMULATOR</span></div>
+          <div class="tool-q">연금 꺼낼 때 세금은 얼마나 떼일까?</div>
+          <div class="tool-name">연금 인출 세금 시뮬레이터</div>
+          <div class="tool-desc">연금저축·IRP 속 돈을 3개 바구니로 나눠 넣으면, 꺼내는 방법별 세금과 연 1,500만원 기준을 지키는 인출 설계를 보여줍니다.</div>
+          <div class="tool-go">시뮬레이션하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/isa-maturity/" data-k="ISA 만기 전략 계산기 3년 연금저축 이전 해지 유지 세후 자산 비교 적립식 거치식">
+          <div class="tool-top"><span class="kind">CALCULATOR</span></div>
+          <div class="tool-q">ISA 만기마다 연금으로 옮길까, 계속 둘까?</div>
+          <div class="tool-name">ISA 만기 전략 계산기</div>
+          <div class="tool-desc">3년 만기마다 연금저축으로 옮기는 전략과 ISA를 끝까지 유지하는 전략의 세후 자산을 연차별로 비교합니다.</div>
+          <div class="tool-go">계산하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/etf-selector/" data-k="ETF 계좌 추천 도구 절세 세금 구조 연금저축 IRP ISA 일반계좌 국내상장 해외 ETF 과세">
+          <div class="tool-top"><span class="kind">TOOL</span></div>
+          <div class="tool-q">이 ETF, 어느 계좌에서 사야 절세될까?</div>
+          <div class="tool-name">ETF 계좌 추천 도구</div>
+          <div class="tool-desc">국내상장 ETF를 세금 구조별로 15개 그룹으로 나눠, 종목 특성에 맞는 계좌를 바로 알려줍니다.</div>
+          <div class="tool-go">찾아보기 →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 03 배당 -->
+    <div class="cat" data-cat="dividend">
+      <div class="cat-head"><span class="cat-num">03</span><h3 class="cat-title">배당 시뮬레이션</h3><span class="cat-desc">배당을 다시 굴리면 얼마나 커질까</span></div>
+      <div class="grid">
+        <a class="tool" href="https://ttokjaetv.github.io/ttokjae-div/" data-k="배당 눈덩이 시뮬레이터 월배당 적립 재투자 배당금 계산기 복리 여러 종목 조합">
+          <div class="tool-top"><span class="kind">SIMULATOR</span></div>
+          <div class="tool-q">배당을 다시 굴리면 월배당은 얼마나 커질까?</div>
+          <div class="tool-name">배당 눈덩이 시뮬레이터</div>
+          <div class="tool-desc">여러 종목을 섞어 매달 적립하고 배당을 재투자하면 월배당과 자산이 해마다 어떻게 불어나는지 보여줍니다.</div>
+          <div class="tool-go">시뮬레이션하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/rediv/" data-k="배당 재투자 계산기 배당률 배당성장률 주가성장률 종목 조합 배당금 계산기 SCHD">
+          <div class="tool-top"><span class="kind">CALCULATOR</span></div>
+          <div class="tool-q">여러 종목을 섞으면 진짜로 얼마 받을까?</div>
+          <div class="tool-name">배당 재투자 계산기</div>
+          <div class="tool-desc">배당률·배당성장률·주가성장률을 종목별로 다르게 적용해 연차별 자산과 배당금 흐름을 비교합니다. 최대 10종목까지.</div>
+          <div class="tool-go">계산하기 →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 04 ETF·포트폴리오 -->
+    <div class="cat" data-cat="etf">
+      <div class="cat-head"><span class="cat-num">04</span><h3 class="cat-title">ETF 데이터·포트폴리오</h3><span class="cat-desc">분배금 이력부터 내 계좌 관리까지</span></div>
+      <div class="grid">
+        <a class="tool" href="https://ttokjaetv.github.io/montly-div/" data-k="국내 상장 월배당 ETF 트래커 분배금 분배율 월중 월말 분배기준일 커버드콜">
+          <div class="tool-top"><span class="kind">TRACKER</span></div>
+          <div class="tool-q">월배당 ETF, 분배금은 매달 얼마씩 나왔을까?</div>
+          <div class="tool-name">국내 상장 월배당 ETF 트래커</div>
+          <div class="tool-desc">분배기준일에 맞춰 월중·월말 ETF를 나눠 보여주고, 종목별 월 분배금·수익률·시총 변화를 확인할 수 있습니다.</div>
+          <div class="tool-go">살펴보기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/schd-tracker/" data-k="SCHD 배당 트래커 미국 배당 다우존스 분기 배당 성장률 원화 환산 구성종목 국내상장 비교">
+          <div class="tool-top"><span class="kind">TRACKER</span><span class="badge auto">매일 자동 갱신</span></div>
+          <div class="tool-q">SCHD 배당, 올해는 얼마나 늘었을까?</div>
+          <div class="tool-name">SCHD 배당 트래커</div>
+          <div class="tool-desc">분기 배당 이력, 연간 배당·성장률, 원화 환산, 구성종목, 국내상장 미국배당다우존스 ETF 비교를 한 페이지에 담았습니다.</div>
+          <div class="tool-go">살펴보기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/portfolio-sheet-data/" data-k="포트폴리오 관리 도구 평가손익 자산 비중 IRP 안전자산 30% 연금저축 ISA 미국 직투 시세">
+          <div class="tool-top"><span class="kind">TOOL</span></div>
+          <div class="tool-q">계좌 여기저기 흩어진 ETF, 한눈에 볼 수 없을까?</div>
+          <div class="tool-name">포트폴리오 관리 도구</div>
+          <div class="tool-desc">연금저축·IRP·ISA·일반계좌의 국내 ETF와 미국 직투를 한 화면에 모아 평가손익, 자산 비중, IRP 안전자산 한도를 계산합니다.</div>
+          <div class="tool-go">관리하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/Water-Calc/" data-k="하락장 물타기 계산기 평단가 분할매수 VIX 공포탐욕지수 RSI 보조지표 추가매수">
+          <div class="tool-top"><span class="kind">CALCULATOR</span></div>
+          <div class="tool-q">하락장, 지금 더 사도 될까?</div>
+          <div class="tool-name">하락장 물타기 계산기</div>
+          <div class="tool-desc">시장 상황과 종목의 보조지표를 함께 보고 물타기 강도를 9단계로 제시하고, 추가 매수 후 평단가를 계산합니다.</div>
+          <div class="tool-go">계산하기 →</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- 05 증권사 비교 -->
+    <div class="cat" data-cat="broker">
+      <div class="cat-head"><span class="cat-num">05</span><h3 class="cat-title">증권사 비교</h3><span class="cat-desc">공식 공시 기준으로 정리한 비교표</span></div>
+      <div class="grid">
+        <a class="tool" href="https://ttokjaetv.github.io/trading-fee/" data-k="증권사 수수료 비교표 국내주식 미국주식 환전 수수료 신규계좌 이벤트">
+          <div class="tool-top"><span class="kind">COMPARE</span></div>
+          <div class="tool-q">수수료 싼 증권사는 어디일까?</div>
+          <div class="tool-name">증권사 수수료 비교표</div>
+          <div class="tool-desc">국내 13개 증권사의 국내주식·미국주식·환전 수수료와 신규계좌 이벤트를 한 표로 정리했습니다.</div>
+          <div class="tool-go">비교하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/tax-account-compare/" data-k="증권사 절세계좌 수수료 비교표 중개형 ISA 연금저축 IRP 운용관리 자산관리 수수료 면제">
+          <div class="tool-top"><span class="kind">COMPARE</span></div>
+          <div class="tool-q">ISA·연금저축·IRP, 어느 증권사가 유리할까?</div>
+          <div class="tool-name">증권사 절세계좌 수수료 비교표</div>
+          <div class="tool-desc">13개 증권사의 중개형ISA·연금저축·IRP 수수료와 IRP 운용·자산관리 수수료 면제 조건을 정리했습니다.</div>
+          <div class="tool-go">비교하기 →</div>
+        </a>
+        <a class="tool" href="https://ttokjaetv.github.io/cma-compare/" data-k="증권사 CMA 금리 비교 RP형 발행어음형 MMW형 MMF형 종금형 예금자보호 파킹통장">
+          <div class="tool-top"><span class="kind">COMPARE</span></div>
+          <div class="tool-q">잠깐 둘 돈, CMA 금리는 어디가 높을까?</div>
+          <div class="tool-name">증권사 CMA 금리 비교</div>
+          <div class="tool-desc">증권사 CMA 금리를 RP형·발행어음형·MMW형·MMF형·종금형 전 유형으로 비교하고, 금액 한도와 예금자보호 여부까지 정리했습니다.</div>
+          <div class="tool-go">비교하기 →</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="empty" id="empty">검색 결과가 없습니다. 다른 단어로 찾아보세요.</div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="step-label"><div class="step-line"></div><span class="step-text">FAQ</span></div>
+    <h2 class="sec-title" id="faq-title">자주 묻는 질문</h2>
+    <details>
+      <summary>무료인가요? 회원가입이 필요한가요?</summary>
+      <p>모든 계산기는 무료이고 가입이나 로그인 없이 바로 쓸 수 있습니다. 스마트폰 브라우저에서도 그대로 열립니다.</p>
+    </details>
+    <details>
+      <summary>계산 결과를 그대로 믿어도 되나요?</summary>
+      <p>계산기는 입력한 수익률·배당률이 일정하게 유지된다고 가정한 시뮬레이션입니다. 실제 결과는 시장 상황, 세금, 수수료에 따라 달라질 수 있으니 방향을 잡는 참고 자료로 활용하세요.</p>
+    </details>
+    <details>
+      <summary>세법 기준은 언제 것인가요?</summary>
+      <p>세금을 다루는 계산기는 화면 하단에 적용한 세법 기준 시점을 표기합니다. 세법은 자주 바뀌므로 실제 신고·인출 전에는 국세청 홈택스나 금융회사에서 최신 기준을 한 번 더 확인하세요.</p>
+    </details>
+  </section>
+
+  <div class="insight-box">
+    <div class="insight-label">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D9542B" stroke-width="2" aria-hidden="true"><path d="M12 3l1.9 5.8L20 10l-4.5 3.3L17 20l-5-3.5L7 20l1.5-6.7L4 10l6.1-1.2L12 3z"/></svg>
+      <span class="insight-label-text">KEY INSIGHT</span>
+    </div>
+    <h3 class="insight-title">계산기 한 번 돌려보는 것보다<br>숫자를 읽는 법을 아는 게 더 중요합니다</h3>
+    <p class="insight-desc">같은 결과라도 어떤 계좌에, 어떤 순서로, 언제 꺼내느냐에 따라 손에 쥐는 돈이 달라집니다. 결과가 낯설다면 영상에서 해석법을 확인해 보세요.</p>
+    <div class="insight-cta">
+      <div class="insight-cta-text">📊 새 계산기가 나오면 똑재TV와 카페에서 가장 먼저 알려드립니다.</div>
+      <div class="cta-links">
+        <a href="https://www.youtube.com/@ttok_jae" target="_blank" rel="noopener" class="cta-link primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          똑재TV 구독하기
+        </a>
+        <a href="https://cafe.naver.com/ttokjae" target="_blank" rel="noopener" class="cta-link secondary">
+          <span class="naver-mark">N</span>
+          평생 ETF 투자 카페 가입
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    ※ 모든 계산기는 투자 판단을 돕기 위한 참고용 시뮬레이션 도구이며, 특정 상품의 매수·매도 권유가 아닙니다.<br>
+    실제 수익과 세금은 시장 상황, 계좌 종류, 세법 개정에 따라 달라질 수 있습니다. 목록 기준일 2026-10-11.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var chips = document.querySelectorAll('.chip');
+  var cats = document.querySelectorAll('.cat');
+  var input = document.getElementById('search');
+  var empty = document.getElementById('empty');
+  var current = 'all';
+
+  function norm(s) { return (s || '').toLowerCase().replace(/\s+/g, ''); }
+
+  function apply() {
+    var q = norm(input.value);
+    var shown = 0;
+    cats.forEach(function (cat) {
+      var catOk = current === 'all' || cat.dataset.cat === current;
+      var visibleInCat = 0;
+      cat.querySelectorAll('.tool').forEach(function (t) {
+        var hay = norm(t.dataset.k + ' ' + t.textContent);
+        var ok = catOk && (!q || hay.indexOf(q) !== -1);
+        t.style.display = ok ? '' : 'none';
+        if (ok) visibleInCat++;
+      });
+      cat.style.display = visibleInCat ? '' : 'none';
+      shown += visibleInCat;
+    });
+    empty.style.display = shown ? 'none' : 'block';
+  }
+
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      chips.forEach(function (x) { x.classList.remove('active'); });
+      c.classList.add('active');
+      current = c.dataset.cat;
+      apply();
+    });
+  });
+  input.addEventListener('input', apply);
+})();
+</script>
+</body>
+</html>
