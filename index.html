@@ -212,7 +212,9 @@
   .tool.featured:hover { border-color: var(--accent); }
 
   .badge.lock { background: var(--bg-alt); color: var(--brown); border: 1px solid var(--beige-gold); }
-  .tool.locked { background: var(--bg-alt); border-style: dashed; border-color: var(--beige-gold); }
+  .tool.locked { background: var(--bg-alt); border-style: dashed; border-color: var(--beige-gold); cursor: default; }
+  .tool.locked:hover { transform: none; box-shadow: none; border-color: var(--beige-gold); }
+  .tool.locked .tool-go { color: var(--ink-mute); }
   .tool.locked .tool-q { color: var(--brown); }
   .member-note { font-size: 14px; font-weight: 500; color: var(--ink-soft); line-height: 1.7; margin: -2px 0 16px; }
   .member-note b { color: var(--ink); font-weight: 800; }
@@ -276,7 +278,7 @@
         <div class="logo-sub">INVESTMENT CALCULATORS</div>
       </div>
     </a>
-    <div class="head-count">무료 도구 <b>13</b>종 + 회원 전용 2종</div>
+    <div class="head-count">무료 도구 <b>13</b>종</div>
   </header>
 
   <div class="hero">
@@ -349,7 +351,7 @@
         <button class="chip" data-cat="pension" role="tab">연금·절세계좌</button>
         <button class="chip" data-cat="dividend" role="tab">배당</button>
         <button class="chip" data-cat="etf" role="tab">ETF 데이터</button>
-        <button class="chip" data-cat="member" role="tab">🔒 우수회원 전용</button>
+        <button class="chip" data-cat="member" role="tab">🛠 준비 중</button>
         <button class="chip" data-cat="broker" role="tab">증권사 비교</button>
       </div>
     </div>
@@ -481,25 +483,25 @@
     </div>
 
 
-    <!-- 06 우수회원 전용 -->
+    <!-- 06 준비 중 -->
     <div class="cat" data-cat="member">
-      <div class="cat-head"><span class="cat-num">06</span><h3 class="cat-title">🔒 우수회원 전용</h3><span class="cat-desc">평생 ETF 투자 카페 우수회원 이상 · 입장 코드 필요</span></div>
-      <p class="member-note">아래 도구는 <b>평생 ETF 투자 카페 우수회원 이상</b>에게만 열려 있습니다. 입장 코드는 카페 우수회원 게시판 공지에서 확인하세요.</p>
+      <div class="cat-head"><span class="cat-num">06</span><h3 class="cat-title">🛠 준비 중</h3><span class="cat-desc">곧 공개될 도구</span></div>
+      <p class="member-note">아래 도구는 지금 <b>다듬는 중</b>입니다. 공개되면 똑재TV와 평생 ETF 투자 카페에서 가장 먼저 알려드릴게요.</p>
       <div class="grid">
-        <a class="tool locked" href="https://cafe.naver.com/ttokjae" target="_blank" rel="noopener" data-k="포트폴리오 관리 도구 평가손익 자산 비중 IRP 안전자산 30% 연금저축 ISA 미국 직투 시세 우수회원 회원전용">
-          <div class="tool-top"><span class="kind">TOOL</span><span class="badge lock">🔒 우수회원</span></div>
+        <div class="tool locked" aria-disabled="true" data-k="포트폴리오 관리 도구 평가손익 자산 비중 IRP 안전자산 30% 연금저축 ISA 미국 직투 시세 우수회원 회원전용">
+          <div class="tool-top"><span class="kind">TOOL</span><span class="badge lock">🛠 준비 중</span></div>
           <div class="tool-q">계좌 여기저기 흩어진 ETF, 한눈에 볼 수 없을까?</div>
           <div class="tool-name">포트폴리오 관리 도구</div>
           <div class="tool-desc">연금저축·IRP·ISA·일반계좌의 국내 ETF와 미국 직투를 한 화면에 모아 평가손익, 자산 비중, IRP 안전자산 한도를 계산합니다.</div>
-          <div class="tool-go">카페에서 입장 안내 보기 →</div>
-        </a>
-        <a class="tool locked" href="https://cafe.naver.com/ttokjae" target="_blank" rel="noopener" data-k="하락장 물타기 계산기 평단가 분할매수 VIX 공포탐욕지수 RSI 보조지표 추가매수 우수회원 회원전용">
-          <div class="tool-top"><span class="kind">CALCULATOR</span><span class="badge lock">🔒 우수회원</span></div>
+          <div class="tool-go">곧 공개 예정</div>
+        </div>
+        <div class="tool locked" aria-disabled="true" data-k="하락장 물타기 계산기 평단가 분할매수 VIX 공포탐욕지수 RSI 보조지표 추가매수 우수회원 회원전용">
+          <div class="tool-top"><span class="kind">CALCULATOR</span><span class="badge lock">🛠 준비 중</span></div>
           <div class="tool-q">하락장, 지금 더 사도 될까?</div>
           <div class="tool-name">하락장 물타기 계산기</div>
           <div class="tool-desc">시장 상황과 종목의 보조지표를 함께 보고 물타기 강도를 9단계로 제시하고, 추가 매수 후 평단가를 계산합니다.</div>
-          <div class="tool-go">카페에서 입장 안내 보기 →</div>
-        </a>
+          <div class="tool-go">곧 공개 예정</div>
+        </div>
       </div>
     </div>
 
