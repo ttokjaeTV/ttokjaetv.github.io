@@ -22,3 +22,12 @@
 ## member-gate.js (현재 미사용)
 - 우수회원 입장 코드 게이트 스크립트. 2026-10-12 두 도구에서 모두 떼어 내 지금은 아무 페이지도 쓰지 않는다.
 - 다시 쓰려면 도구 `<head>`에 `<script src="https://ttokjaetv.github.io/member-gate.js"></script>` 한 줄을 넣는다. 코드 교체는 파일 안 `version`·`verifier` 를 바꾼다 (검증값 계산: `python3 -c "import hashlib,base64,re;c=re.sub(r'[\s\-_.]+','','새코드'.strip().lower());print(base64.b64encode(hashlib.pbkdf2_hmac('sha256',c.encode(),b'ttokjae-member-verify-v1',200000)).decode())"`).
+
+## member-lock.js (투자 Tool 멤버십 — 기능 일부 잠금, 지금은 꺼져 있음)
+- 기본 계산은 무료로 두고 멤버십 전용 기능만 잠그는 공통 스크립트. 도구 전체를 잠그는 member-gate.js 와 다르다.
+- **스위치:** 파일 안 `LOCK.on = false`. 꺼져 있으면 어떤 화면도 바뀌지 않는다. 멤버십 판매를 시작할 때 `true` 로 바꾸면 표시해 둔 22개 도구가 한꺼번에 잠긴다.
+  - 켜기 전에 `isMember()` 를 강의실 로그인(lecture-room 의 tool-gate.js, `my_access('tools')`)과 연결해야 한다. 지금은 연결 전이라 켜면 모두 비회원으로 본다.
+- **미리 보기:** 아무 도구 주소 끝에 `?lock=preview` → 이 브라우저에서 비회원 화면으로 보인다. `?lock=off` 로 끈다.
+- **도구에 표시하는 법:** `<head>` 에 `<script src="https://ttokjaetv.github.io/member-lock.js"></script>` 한 줄, 그리고
+  - 패널 전체: `data-member="라벨"` / 버튼·탭: `data-member-click="라벨"` / 코드 안 제한: `if (window.TJLock && !TJLock.allow('라벨')) return;`
+- 무료·멤버십 나눔 기준은 "투자 Tool 무료·멤버십 나눔안" 문서(2026-10-18). 비교표·트래커 5종과 배당 재투자 계산기(rediv)는 당분간 전부 무료라 표시하지 않았고, 하락장 물타기 계산기는 표현 수정 결정 전이라 빠져 있다.
