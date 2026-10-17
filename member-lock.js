@@ -117,8 +117,12 @@
   }
 
   // ---- 패널 가리기 ----
+  function hasCover(el) {
+    for (var i = 0; i < el.children.length; i++) if (el.children[i].classList.contains('tjl-cover')) return true;
+    return false;
+  }
   function cover(el) {
-    if (el.classList.contains('tjl-box')) return;
+    if (hasCover(el)) return;   // 칸이 내용을 통째로 다시 그려 안내 카드가 지워졌으면 다시 붙인다
     el.classList.add('tjl-box');
     var c = document.createElement('div');
     c.className = 'tjl-cover';
@@ -144,7 +148,7 @@
     if (!active()) { uncoverAll(); return; }
     style();
     Array.prototype.forEach.call(document.querySelectorAll('[data-member]'), function (el) {
-      if (el.classList.contains('tjl-box')) fit(el); else cover(el);
+      if (hasCover(el)) fit(el); else cover(el);
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-member-click]'), function (el) { el.classList.add('tjl-mark'); });
   }
