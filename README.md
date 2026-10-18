@@ -23,6 +23,13 @@
 - 우수회원 입장 코드 게이트 스크립트. 2026-10-12 두 도구에서 모두 떼어 내 지금은 아무 페이지도 쓰지 않는다.
 - 다시 쓰려면 도구 `<head>`에 `<script src="https://ttokjaetv.github.io/member-gate.js"></script>` 한 줄을 넣는다. 코드 교체는 파일 안 `version`·`verifier` 를 바꾼다 (검증값 계산: `python3 -c "import hashlib,base64,re;c=re.sub(r'[\s\-_.]+','','새코드'.strip().lower());print(base64.b64encode(hashlib.pbkdf2_hmac('sha256',c.encode(),b'ttokjae-member-verify-v1',200000)).decode())"`).
 
+## tool-gate.js (투자 Tool 멤버십 잠금, 2026-10-17 · 시험 중)
+- 강의실(`ttokjaetv.github.io/lecture-room/`)과 **같은 Supabase 로그인**으로 멤버십 회원만 도구를 열게 하는 스크립트. member-gate.js(공용 입장 코드)를 대신할 정식 방식.
+- 도구 `<head>` 맨 위에 `<script src="https://ttokjaetv.github.io/tool-gate.js"></script>` 한 줄. 상품 이름 기본값 `tools`, 바꾸려면 `data-product="이름"`, 배지 끄기 `data-badge="off"`.
+- 멤버십 부여: 강의실 관리자 → 수강생 → [이용 권한 부여] → `[멤버십] 투자 Tool 멤버십`.
+- **한계**: 화면 가리기만으로는 코드를 뜯어보는 사람을 못 막는다. 지켜야 할 데이터는 Supabase `tool_data` 테이블에 넣고 도구에서 `ToolGate.data('키')` 로 읽는다(서버가 회원에게만 내줌).
+- 지금은 어떤 도구에도 넣지 않았다. 시험 페이지: `ttokjaetv.github.io/lecture-room/tool-test.html`.
+
 ## member-lock.js (투자 Tool 멤버십 — 기능 일부 잠금, 지금은 꺼져 있음)
 - 기본 계산은 무료로 두고 멤버십 전용 기능만 잠그는 공통 스크립트. 도구 전체를 잠그는 member-gate.js 와 다르다.
 - **스위치:** 파일 안 `LOCK.on = false`. 꺼져 있으면 어떤 화면도 바뀌지 않는다. 멤버십 판매를 시작할 때 `true` 로 바꾸면 표시해 둔 22개 도구가 한꺼번에 잠긴다.
