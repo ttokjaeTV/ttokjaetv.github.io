@@ -6,11 +6,14 @@
  * ■ 스위치 (지금은 꺼져 있음)
  *   LOCK.on = false  → 아무것도 바뀌지 않는다. 모든 기능이 누구에게나 열린다.
  *   LOCK.on = true   → 멤버십 회원이 아니면 표시한 기능에 안내가 뜬다.
- *   켜기 전에 isMember() 를 강의실 로그인(lecture-room 의 tool-gate.js, my_access('tools'))과 연결해야 한다.
+ *   회원 확인은 강의실과 같은 Supabase 로그인으로 my_access('tools') 를 묻는다 (2026-10-18 연결).
+ *   강의실에서 로그인한 적이 없는 브라우저는 서버에 묻지 않고 바로 비회원으로 본다.
  *
  * ■ 켜진 모습 미리 보기 (주인만, 스위치와 상관없이)
  *   주소 끝에 ?lock=preview  → 이 브라우저에서 비회원 화면으로 보인다.
- *   ?lock=off                → 미리 보기를 끈다.
+ *   ?lock=test               → 스위치가 꺼져 있어도 이 브라우저에서만 '켠 것처럼' 실제 로그인으로 판정한다.
+ *                              왼쪽 아래에 판정 결과(회원 · 로그인 안 됨 · 권한 없음 · 상품 비공개 등)가 뜬다.
+ *   ?lock=off                → 미리 보기 · 시험을 끈다.
  *
  * ■ 도구에 표시하는 법
  *   1) <head> 에 한 줄:  <script src="https://ttokjaetv.github.io/member-lock.js"></script>
@@ -33,28 +36,69 @@
     shopUrl: 'https://ttokjaetv.github.io/lecture-room/tools-shop.html',
     loginUrl: 'https://ttokjaetv.github.io/lecture-room/classroom.html',
     price: '월 8,900원',
-    previewKey: 'tjlock-preview'
+    previewKey: 'tjlock-preview',
+    testKey: 'tjlock-test',
+    // 강의실과 같은 Supabase (공개용 키 — secret 키 절대 금지)
+    product: 'tools',
+    supabaseUrl: 'https://vpphzfbuzkmhlojvfkjr.supabase.co',
+    supabaseKey: 'sb_publishable_KsEHk7U9y729c6w9L5KF3Q_9WTRTF5j',
+    sdk: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js'
   };
 
   // ---- 미리 보기 스위치 (?lock=preview / ?lock=off) ----
-  var preview = false;
+  var preview = false, test = false;
   try {
     var q = new URLSearchParams(location.search).get('lock');
-    if (q === 'preview') localStorage.setItem(LOCK.previewKey, '1');
-    if (q === 'off') localStorage.removeItem(LOCK.previewKey);
+    if (q === 'preview') { localStorage.setItem(LOCK.previewKey, '1'); localStorage.removeItem(LOCK.testKey); }
+    if (q === 'test') { localStorage.setItem(LOCK.testKey, '1'); localStorage.removeItem(LOCK.previewKey); }
+    if (q === 'off') { localStorage.removeItem(LOCK.previewKey); localStorage.removeItem(LOCK.testKey); }
     preview = localStorage.getItem(LOCK.previewKey) === '1';
+    test = !preview && localStorage.getItem(LOCK.testKey) === '1';
   } catch (e) {}
+  var judging = (LOCK.on || test) && !preview;   // 실제 로그인으로 회원 여부를 판정하는가
 
   var member = false;   // 켜진 상태에서 회원 여부. isMember() 결과로 채운다.
-  function active() { return (LOCK.on || preview) && !member; }
+  function active() { return (LOCK.on || preview || test) && !member; }
 
-  // 회원 확인 — 스위치를 켤 때 강의실 로그인과 연결한다. 지금은 아무도 회원이 아닌 것으로 본다.
+  // ---- 회원 확인 (강의실과 같은 로그인) ----
+  // 결과: { ok: true/false, reason: 'login' | 'not_found' | 'expired' | 'none' | 'error' … }
+  function sessionKey() {
+    try { return 'sb-' + new URL(LOCK.supabaseUrl).hostname.split('.')[0] + '-auth-token'; } catch (e) { return ''; }
+  }
+  function hasSession() {   // 로그인한 적 없는 브라우저는 서버에 묻지 않는다 (계산기 속도 보호)
+    try {
+      var s = JSON.parse(localStorage.getItem(sessionKey()) || 'null');
+      if (s && s.currentSession) s = s.currentSession;
+      return !!(s && s.refresh_token);
+    } catch (e) { return false; }
+  }
+  function loadSdk() {
+    if (window.supabase && window.supabase.createClient) return Promise.resolve();
+    return new Promise(function (res, rej) {
+      var sc = document.createElement('script');
+      sc.src = LOCK.sdk; sc.onload = res; sc.onerror = function () { rej(new Error('sdk')); };
+      document.head.appendChild(sc);
+    });
+  }
+  var client = null;
   function isMember() {
-    if (preview) return Promise.resolve(false);
-    if (window.ToolGate && typeof window.ToolGate.check === 'function') {
-      return Promise.resolve(window.ToolGate.check('tools')).then(function (a) { return !!a; }, function () { return false; });
-    }
-    return Promise.resolve(false);
+    if (preview) return Promise.resolve({ ok: false, reason: 'preview' });
+    if (!hasSession()) return Promise.resolve({ ok: false, reason: 'login' });
+    return loadSdk().then(function () {
+      client = client || (window.ToolGate && window.ToolGate.client) || window.supabase.createClient(LOCK.supabaseUrl, LOCK.supabaseKey, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+      });
+      return client.auth.getSession();
+    }).then(function (r) {
+      if (!(r && r.data && r.data.session)) return { data: { ok: false, reason: 'login' } };
+      return client.rpc('my_access', { p_slug: LOCK.product });
+    }).then(function (res) {
+      if (res.error) throw res.error;
+      var a = res.data || {};
+      return { ok: !!a.ok, reason: a.ok ? 'ok' : (a.reason || 'none'), admin: !!a.admin, expires_at: a.expires_at || null };
+    }).catch(function (e) {
+      return { ok: false, reason: 'error', msg: (e && e.message) || String(e) };
+    });
   }
 
   // ---- 스타일 (켜졌을 때만 넣는다) ----
@@ -185,6 +229,20 @@
   document.addEventListener('click', later);
   window.addEventListener('resize', later);
 
+  // 시험 모드 판정 결과 표시
+  var WHY = {
+    ok: '회원 — 잠금 풀림', login: '비회원 — 강의실에 로그인 안 됨', not_enrolled: '비회원 — 멤버십 권한 없음', none: '비회원 — 멤버십 권한 없음',
+    not_found: '비회원 — 멤버십 상품이 비공개이거나 없음(관리자만 통과)', expired: '비회원 — 멤버십 기간 끝남',
+    not_started: '비회원 — 멤버십 시작 전', error: '확인 실패'
+  };
+  var tbadge = null;
+  function testBadge(text) {
+    if (!test) return;
+    style();
+    if (!tbadge) { tbadge = document.createElement('div'); tbadge.className = 'tjl-badge'; document.body.appendChild(tbadge); }
+    tbadge.innerHTML = '멤버십 잠금 시험: ' + esc(text) + '<a href="' + LOCK.loginUrl + '" target="_blank" rel="noopener">로그인</a><a href="?lock=off">끄기</a>';
+  }
+
   function start() {
     if (preview) {
       style();
@@ -194,11 +252,13 @@
       document.body.appendChild(b);
     }
     apply(); watch();
-    if (LOCK.on && !preview) {
-      isMember().then(function (yes) {
-        member = !!yes;
+    if (judging) {
+      testBadge('확인 중…');
+      isMember().then(function (r) {
+        member = !!r.ok;
         if (member) { uncoverAll(); if (mo) { mo.disconnect(); mo = null; } }
-        try { window.dispatchEvent(new CustomEvent('tjlock-change', { detail: { member: member } })); } catch (e) {}
+        testBadge((WHY[r.reason] || ('비회원 — ' + r.reason)) + (r.admin ? ' (관리자)' : '') + (r.msg ? ' · ' + r.msg : ''));
+        try { window.dispatchEvent(new CustomEvent('tjlock-change', { detail: { member: member, reason: r.reason } })); } catch (e) {}
       });
     }
   }
@@ -214,6 +274,8 @@
     prompt: modal,
     /** 동적으로 그린 칸에 다시 표시 적용 */
     refresh: function () { apply(); },
+    /** 회원 여부 (판정 전·스위치 꺼짐이면 false) */
+    member: function () { return member; },
     config: LOCK
   };
 
