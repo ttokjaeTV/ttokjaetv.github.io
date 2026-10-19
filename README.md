@@ -40,3 +40,8 @@
 - **도구에 표시하는 법:** `<head>` 에 `<script src="https://ttokjaetv.github.io/member-lock.js"></script>` 한 줄, 그리고
   - 패널 전체: `data-member="라벨"` / 버튼·탭: `data-member-click="라벨"` / 코드 안 제한: `if (window.TJLock && !TJLock.allow('라벨')) return;`
 - 무료·멤버십 나눔 기준은 "투자 Tool 무료·멤버십 나눔안" 문서(2026-10-18). 비교표·트래커 5종과 배당 재투자 계산기(rediv)는 당분간 전부 무료라 표시하지 않았고, 하락장 물타기 계산기는 표현 수정 결정 전이라 빠져 있다.
+
+## rules/ (계산기 공용 제도 상수, 2026-10-19 · 계산기 이관 전)
+- 세금·건보료·연금·국민연금·매매비용 요율·한도·구간표만 모은 단일 출처. 계산기는 `<script src="https://ttokjaetv.github.io/rules/v2026.1/rules.js"></script>` 를 자기 스크립트보다 먼저 넣고 `TTOKJAE_RULES.NHIS.healthRate` 처럼 읽는다(전역은 `TTOKJAE_RULES` 하나).
+- **배포한 버전 폴더(`rules/v2026.1/`)는 고치지 않는다.** 값이 바뀌면 `v2026.2`·`v2027.1` 새 폴더를 내고 계산기가 버전 번호를 올린다.
+- 검증: `node rules/tests/check-values.js` (계산기 코드 값과 대조), `node rules/tools/scan-hardcoded.js --all <clone 폴더>` (하드코딩 남은 곳). 자세한 내용은 `rules/README.md`.
