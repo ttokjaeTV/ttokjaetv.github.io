@@ -2,6 +2,11 @@
 
 배포한 버전 폴더는 고치지 않습니다. 바뀐 값은 새 버전 폴더로 내고 여기에 적습니다. (정책: `README.md` "버전 정책")
 
+## fill-v1.js — 2026-10-19 (값 변경 없음)
+
+- 정적 HTML 설명 문구의 숫자를 `data-rule` 식으로 rules 값에서 채우는 도우미 추가(`rules/fill-v1.js`, 시험 `tests/fill-test.js`).
+- `tools/scan-hardcoded.js --text`가 `data-rule` 요소 안 글자를 세지 않도록 수정.
+
 ## v2026.1 — 2026-10-19 (처음)
 
 - 25개 계산기(ttokjaeTV 조직) 배포본에 흩어져 있던 제도 상수를 한 파일로 모음: `rules/v2026.1/rules.js`

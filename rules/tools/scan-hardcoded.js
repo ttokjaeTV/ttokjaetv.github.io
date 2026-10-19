@@ -243,6 +243,9 @@ function scanFile(fp, rel) {
     return blank(all);
   });
   html = html.replace(/<style\b[\s\S]*?<\/style>/gi, blank).replace(/<svg\b[\s\S]*?<\/svg>/gi, blank);
+  // fill-v1.js가 rules 값으로 채우는 곳(data-rule)은 원래 글자가 남아 있어도 하드코딩이 아님
+  html = html.replace(/(<(\w+)\b[^>]*\bdata-rule\s*=[^>]*>)([^<]*)(<\/\2>)/g, (all, open, tag, inner, close) => open + blank(inner) + close);
+  html = html.replace(/<[^>]*\bdata-rule-attr\s*=[^>]*>/g, blank);
   // 입력 속성 값
   const attrRe = /\b(value|data-[\w-]+|placeholder)\s*=\s*"\s*(-?\d[\d_]*(?:\.\d+)?(?:e\d+)?|\.\d+)\s*"/g;
   let m;

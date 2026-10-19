@@ -15,6 +15,8 @@
 | `rules/CHANGELOG.md` | 버전별 바뀐 값 |
 | `rules/tests/check-values.js` | rules.js의 모든 값을 계산기 clone의 코드 값과 대조(표 출력, 불일치 시 종료 코드 1) |
 | `rules/tools/scan-hardcoded.js` | 계산기 코드에 rules.js 값이 숫자로 박혀 있는 곳을 file:line으로 나열(이관 검증·회귀 감시) |
+| `rules/fill-v1.js` | 정적 HTML 설명 문구의 숫자를 rules 값으로 채우는 도우미(`data-rule` 속성). 계산은 안 하고 글자만 바꿈. 배포 후 고치지 않음(바꿀 일이 생기면 `fill-v2.js`) |
+| `rules/tests/fill-test.js` | fill-v1.js 식 계산·표시 형식 시험 |
 
 ## 구조 (v2026.1)
 
@@ -71,6 +73,24 @@ TTOKJAE_RULES
 - retire-check처럼 **다른 계산기 엔진(pension-tax-sim/src/engine.js)을 실시간으로 불러오는 페이지**는 그 엔진이 쓰는 rules 버전도 페이지에 들어 있어야 합니다. 엔진 쪽에서 rules를 쓰게 바꾸면 retire-check에도 같은 버전의 rules.js 태그를 엔진보다 먼저 넣으세요.
 - 만원 단위로 계산하는 계산기(retire-check)는 `R.PENSION.separateLimit / 1e4`처럼 나눠 씁니다. % 숫자로 보여 주는 칩·옵션은 `(R.PENSION.rateByAge[0][1] * 100).toFixed(1)`처럼 화면에서 만듭니다.
 - 설명 문구에 적힌 숫자('7.19%', '211.5원', '× 10%')도 가능하면 rules 값으로 만들어 넣으세요. `scan-hardcoded.js --text`로 남은 문구를 찾을 수 있습니다.
+
+### 설명 문구 숫자 채우기 (`fill-v1.js`)
+
+정적 HTML 문단·표·칩 글자에 적힌 제도 숫자는 `fill-v1.js`가 rules 값으로 채웁니다. rules.js 태그 **바로 다음**에 넣습니다.
+
+```html
+<script src="https://ttokjaetv.github.io/rules/v2026.1/rules.js"></script>
+<script src="https://ttokjaetv.github.io/rules/fill-v1.js"></script>
+…
+건보료율 <span data-rule="NHIS.healthRate*100">7.19</span>% · 연 <span data-rule="PENSION.separateLimit/1e4">1,500</span>만원
+최고 <span data-rule="INCOME_TAX.brackets.7.1*(1+INCOME_TAX.local)*100">49.5</span>%
+```
+
+- `data-rule`: 숫자·rules 경로(배열은 번호)·`+ - * /`·괄호만 쓰는 식(eval 안 씀). `data-fmt`: 생략(쉼표·필요한 소수) / `fN`(소수 N자리, 쉼표 없음) / `nN`(쉼표 + 소수 N자리) / `i`(연도). `data-rule-attr="placeholder"`면 글자 대신 그 속성을 바꿈.
+- 원래 글자는 그대로 둡니다. rules.js를 못 불러오면 원래 글자가 보입니다.
+- 새 rules 버전으로 올렸을 때 바뀐 문구는 페이지 주소에 `?rulescheck`를 붙이면 콘솔 표로 볼 수 있습니다.
+- `<title>`·`<meta>`(검색·공유용), 확인 날짜('2026-10-12 확인'), 시행 연도 같은 역사적 사실은 채우지 않습니다. 해가 바뀌면 사람이 고칩니다.
+- `scan-hardcoded.js --text`는 `data-rule` 요소 안 글자를 세지 않습니다.
 
 ### 이관 대응표 (주요 리터럴 → rules 경로)
 
