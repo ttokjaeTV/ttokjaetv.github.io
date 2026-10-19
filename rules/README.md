@@ -11,7 +11,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| `rules/v2026.1/rules.js` | 상수 본체. 브라우저에서는 전역 `TTOKJAE_RULES` 하나만 만들고, Node에서는 `module.exports`. 깊게 얼려(deep freeze) 있어 실수로 값을 바꿀 수 없음 |
+| `rules/v2026.1/rules.js`, `rules/v2026.2/rules.js` | 상수 본체(최신 v2026.2 = v2026.1 + 키 추가, 값 변경 없음). 브라우저에서는 전역 `TTOKJAE_RULES` 하나만 만들고, Node에서는 `module.exports`. 깊게 얼려(deep freeze) 있어 실수로 값을 바꿀 수 없음 |
 | `rules/CHANGELOG.md` | 버전별 바뀐 값 |
 | `rules/tests/check-values.js` | rules.js의 모든 값을 계산기 clone의 코드 값과 대조(표 출력, 불일치 시 종료 코드 1) |
 | `rules/tools/scan-hardcoded.js` | 계산기 코드에 rules.js 값이 숫자로 박혀 있는 곳을 file:line으로 나열(이관 검증·회귀 감시) |
@@ -28,7 +28,7 @@ TTOKJAE_RULES
 │                     employeeExtraIncomeDeduction, truncUnit, dependent{income, biz, propLow, propHigh, propIncome}
 ├─ PROPERTY           fairMarketRatioSingleHome [[3억,0.43],[6억,0.44],[∞,0.45]], fairMarketRatioMultiHome 0.6
 ├─ INCOME_TAX         brackets [[상한, 세율, 누진공제]…], local 0.1, basicDeduction, elderDeduction, elderAge,
-│                     standardTaxCredit, pensionIncomeDeduction [[상한, 율, 구간시작, 누적]…], pensionIncomeDeductionCap
+│                     standardTaxCredit, dependentIncomeLimit(v2026.2~), pensionIncomeDeduction [[상한, 율, 구간시작, 누적]…], pensionIncomeDeductionCap
 ├─ FIN_INCOME         threshold 2,000만, withholding 0.14, withholdingWithLocal 0.154, usWithholding 0.15,
 │                     grossUp 0.10, grossUpByYear {2026: 0.10, 2027: 0.11}
 ├─ PENSION            사적연금 인출: minAge, separateLimit 1,500만, rateByAge [[70,0.055],[80,0.044],[∞,0.033]],
@@ -38,7 +38,7 @@ TTOKJAE_RULES
 ├─ PENSION_SAVINGS    creditRateHigh/Low, 기준 소득, creditLimitPensionSavings 600만, creditLimitTotal 900만,
 │                     contributionLimit 1,800만, isaTransferCreditRate 0.1, isaTransferCreditCap 300만, irpRiskAssetLimit 0.7
 ├─ ISA                annualLimit, totalLimit, taxFreeGeneral, taxFreePreferential, excessRate, minHoldingYears
-├─ NPS                A, aYear, incomeFloorMonthly, incomeCapMonthly, premiumRateByYear{2025..2033}, employeeShareRatio,
+├─ NPS                A, aYear, bWeightUntilYear·bWeightOld(v2026.2~, 1998년 이전 B 0.75), incomeFloorMonthly, incomeCapMonthly, premiumRateByYear{2025..2033}, employeeShareRatio,
 │                     alphaByYear{1988..2026}, startAgeByBirthYear, earlyReductionPerYear, maxEarlyYears,
 │                     deferralBonusPerYear, maxDeferralYears, familyBenefitSpouseMonthly, familyBenefitOtherMonthly,
 │                     minMonths, maxChunapMonths, firstYear, truncUnit
@@ -182,11 +182,8 @@ node rules/tools/scan-hardcoded.js <repo 경로> …
 
 ## 지금 원문을 확인하지 못한 값 (`TODO 확인 필요`)
 
-계산기 간 값은 모두 같지만, 2026-10-19 전수 점검에서 고시 원문을 찾지 못한 값입니다. 값은 계산기와 같게 두었습니다.
-
-- `NPS.A` 3,193,511원 (2026년 A값)
-- `NPS.familyBenefitSpouseMonthly` 25,550원 · `NPS.familyBenefitOtherMonthly` 17,030원 (2026년 부양가족연금액)
-- `FIN_INCOME.grossUpByYear[2027]` 0.11 (2027년 배당가산율 11%, 아직 어떤 계산기도 계산에 쓰지 않음)
+- `FIN_INCOME.grossUpByYear[2027]` 0.11 (2027년 배당가산율 11%, 개정 원문 미확인, 아직 어떤 계산기도 계산에 쓰지 않음)
+- (v2026.2에서 해제) `NPS.A` 3,193,511원, 부양가족연금 25,550원·17,030원 — 보건복지부 국민연금 급여 안내로 확인
 
 ## rules.js가 해결하지 않는 것 (계산 방식 차이)
 

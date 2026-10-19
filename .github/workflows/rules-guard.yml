@@ -1,0 +1,104 @@
+# 계산기 공용 자동 검사 (각 계산기 저장소의 .github/workflows/rules-guard.yml 이 부른다)
+# 검사 내용은 이 파일 한 곳에서 관리한다. 계산기 쪽은 빌드·테스트 명령만 넘긴다.
+#
+#  1. 제도 숫자 하드코딩: rules/tools/scan-hardcoded.js --fail-on-hit (제도 값이 아닌 줄은 'rules-ok: 이유' 표시)
+#  2. 불러오는 rules 주소(rules/vX/rules.js, rules/fill-vN.js)가 허브에 실제로 있는지
+#  3. 빌드형이면 index.html이 원본(src)을 빌드한 결과와 같은지
+#  4. 계산 테스트
+# 실패하면 '기준값·계산 검사 실패' 이슈를 열고 @bujajoon·@ttokjae-collab 을 멘션한다(이미 열려 있으면 댓글).
+# 다시 통과하면 그 이슈를 닫는다. (goal-calc 계산 테스트 알림과 같은 방식)
+name: 기준값·계산 검사 (공용)
+
+on:
+  workflow_call:
+    inputs:
+      build:
+        description: 'index.html을 만드는 명령 (빌드형만, 예: python3 src/build.py)'
+        type: string
+        default: ''
+      test:
+        description: '계산 테스트 명령 (예: node src/test.js)'
+        type: string
+        default: ''
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 허브(rules) 가져오기
+        uses: actions/checkout@v4
+        with:
+          repository: ttokjaeTV/ttokjaetv.github.io
+          path: ttokjaetv.github.io
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 제도 숫자 하드코딩 검사
+        run: |
+          node ttokjaetv.github.io/rules/tools/scan-hardcoded.js . --fail-on-hit 2>&1 | tee -a guard-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: rules 주소 확인
+        run: |
+          fail=0
+          for p in $(grep -ohE 'ttokjaetv\.github\.io/rules/[A-Za-z0-9._/-]+\.js' index.html src/*.html 2>/dev/null | sort -u); do
+            f="ttokjaetv.github.io/${p#ttokjaetv.github.io/}"
+            if [ -f "$f" ]; then echo "있음: $p"; else echo "::error::허브에 없는 rules 파일: https://$p" | tee -a guard-output.txt; fail=1; fi
+          done
+          exit $fail
+
+      - name: 빌드 결과 최신 여부
+        if: inputs.build != ''
+        run: |
+          ${{ inputs.build }}
+          if ! git diff --quiet -- index.html; then
+            echo "::error::index.html이 원본(src)을 빌드한 결과와 다릅니다. 원본을 고친 뒤 '${{ inputs.build }}'로 다시 빌드해 커밋하세요." | tee -a guard-output.txt
+            git diff --stat -- index.html | tee -a guard-output.txt
+            exit 1
+          fi
+
+      - name: 계산 테스트
+        if: inputs.test != ''
+        run: |
+          ${{ inputs.test }} 2>&1 | tee -a guard-output.txt
+          exit ${PIPESTATUS[0]}
+
+      # ---------- 알림 ----------
+      - name: 실패 알림 (이슈 열기·댓글)
+        if: failure() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            echo "@bujajoon @ttokjae-collab ${{ github.event.repository.name }} 기준값·계산 검사가 실패했습니다."
+            echo
+            echo "- 커밋: ${GITHUB_SHA::7} — $(git log -1 --pretty=%s)"
+            echo "- 실행 기록: $RUN_URL"
+            echo
+            echo "제도 숫자를 코드에 직접 적었거나(→ rules.js 값으로), 빌드·테스트가 맞지 않습니다. 사이트에는 이미 배포됐을 수 있으니 확인 후 고쳐 주세요."
+            echo
+            echo '```'
+            tail -n 40 guard-output.txt 2>/dev/null
+            echo '```'
+          } > body.md
+          num=$(gh issue list --state open --search "기준값·계산 검사 실패 in:title" --json number --jq '.[0].number')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file body.md
+          else
+            gh issue create --title "기준값·계산 검사 실패" --body-file body.md
+          fi
+
+      - name: 통과하면 열린 실패 이슈 닫기
+        if: success() && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for num in $(gh issue list --state open --search "기준값·계산 검사 실패 in:title" --json number --jq '.[].number'); do
+            gh issue close "$num" --comment "다시 통과했습니다 (${GITHUB_SHA::7}). 자동으로 닫습니다."
+          done

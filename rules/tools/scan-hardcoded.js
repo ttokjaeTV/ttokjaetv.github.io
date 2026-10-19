@@ -13,6 +13,10 @@
  *   --fail-on-hit   코드·속성 하드코딩이 하나라도 있으면 종료 코드 1 (이관 끝난 계산기 CI용)
  *   --include-tests src/*test*.js도 검사 (기본은 제외 — 테스트 기대값은 숫자가 맞음)
  *
+ * 제도 값이 아닌데 숫자가 같아 걸리는 줄(물가 가정 2.5, 차트 선 굵기, 탐색 후보값 등)은 그 줄 끝에
+ *   JS: // rules-ok: 이유     HTML: <!-- rules-ok: 이유 -->
+ * 를 붙이면 세지 않는다(--fail-on-hit 자동 검사에서 빠지고, 맨 아래 '제외' 건수로만 나옴). 이유를 꼭 적는다.
+ *
  * 검사 대상: <repo>/index.html 의 인라인 <script>(JSON 제외)와 입력 속성(value·data-*·placeholder),
  *            <repo>/src/*.js, <repo>/src/*.html (build.py로 index.html을 만드는 계산기의 원본).
  * 주석(//, /* *\/, <!-- -->)과 CSS는 보지 않는다. JS 문자열 안 숫자는 --text에서만 센다.
@@ -207,6 +211,8 @@ function lex(src) {
 
 // 줄 수를 유지한 채 구간을 공백으로 지우기
 const blank = s => s.replace(/[^\n]/g, ' ');
+const OK_MARK = /rules-ok\s*:/;   // 제도 값이 아님 표시(이유 필수) — 그 줄의 숫자는 세지 않음
+let okCount = 0;
 
 function scanFile(fp, rel) {
   const raw = fs.readFileSync(fp, 'utf8');
@@ -220,6 +226,7 @@ function scanFile(fp, rel) {
     const lt = lines[lineNo - 1] || '';
     const win = lines.slice(Math.max(0, lineNo - 3), lineNo).join(' ');   // 그 줄 + 위 2줄 (여러 줄 함수 문맥)
     const ent = ents.find(e => !e.ctx || (e.ctx.test(win) && !EXCLUDE.test(lt)));
+    if (ent && OK_MARK.test(lt)) { okCount++; return; }
     if (ent) hits.push({ file: rel, line: lineNo, kind, value: tok, label: ent.label, src: lt.trim().slice(0, 140) });
   };
   const addText = (s, lineNo) => {
@@ -306,5 +313,6 @@ for (const r of tbl) console.log(r.map((x, i) => pad(x, W[i])).join(' | '));
 console.log(W.map(w => '-'.repeat(w)).join('-+-'));
 console.log(tot.map((x, i) => pad(x, W[i])).join(' | '));
 
+if (okCount) console.log(`(rules-ok 표시로 제외한 숫자 ${okCount}개)`);
 if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify({ scanned: new Date().toISOString(), result }, null, 1));
 process.exit(FAIL && tot[3] > 0 ? 1 : 0);
