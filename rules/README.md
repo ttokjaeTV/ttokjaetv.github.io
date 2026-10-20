@@ -230,7 +230,7 @@ calc-v1.js를 쓰는 계산기는 같은 로더로 `global.TTOKJAE_CALC`도 엔�
 ### 검증 도구
 
 ```bash
-# rules.js ↔ 계산기 코드 값 대조 (clone 폴더 기본값: ../../../_점검/calc-verify/consistency/repos 또는 환경변수 TTOKJAE_REPOS)
+# rules.js ↔ 계산기 코드 값 대조 (clone 폴더 기본값: ../../../../_점검/calc-verify/consistency/repos 또는 환경변수 TTOKJAE_REPOS)
 node rules/tests/check-values.js [clone 폴더] [--rules rules/v2026.2/rules.js] [--only] [--allow-missing]
 node rules/tests/check-values.js --rules rules/v2026.2/rules.js --self-only   # 'rules.js 자체' 행만 (clone 없이, 허브 CI)
 

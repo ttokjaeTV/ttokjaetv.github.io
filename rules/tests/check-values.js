@@ -5,7 +5,7 @@
  *   node rules/tests/check-values.js [계산기 clone 폴더] [--rules 경로] [--allow-missing] [--only 실패만]
  *
  *   계산기 clone 폴더: 하위에 <repo>/index.html(·src/engine.js)이 있는 폴더.
- *     기본값: 환경변수 TTOKJAE_REPOS → 없으면 ../../../_점검/calc-verify/consistency/repos (이 파일 기준)
+ *     기본값: 환경변수 TTOKJAE_REPOS → 없으면 ../../../../_점검/calc-verify/consistency/repos (이 파일 기준)
  *   --rules: 검증할 rules.js (기본 ../v2026.1/rules.js)
  *   --allow-missing: 코드에서 패턴을 못 찾은 항목(= 이미 TTOKJAE_RULES로 옮겼거나 코드가 바뀜)을 실패로 치지 않음
  *   --only: 일치(OK) 행은 표에서 빼고 출력
@@ -24,7 +24,7 @@ const argv = process.argv.slice(2);
 const flag = f => argv.includes(f);
 const opt = (f, d) => { const i = argv.indexOf(f); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const positional = argv.filter((a, i) => !a.startsWith('--') && !(i > 0 && argv[i - 1] === '--rules'));
-const REPOS = path.resolve(positional[0] || process.env.TTOKJAE_REPOS || path.join(__dirname, '../../../_점검/calc-verify/consistency/repos'));
+const REPOS = path.resolve(positional[0] || process.env.TTOKJAE_REPOS || path.join(__dirname, '../../../../_점검/calc-verify/consistency/repos'));
 const RULES_PATH = path.resolve(opt('--rules', path.join(__dirname, '../v2026.1/rules.js')));
 const ALLOW_MISSING = flag('--allow-missing');
 const ONLY_BAD = flag('--only');
