@@ -1,0 +1,62 @@
+{
+  "year": 2026,
+  "about": "건강보험료(국민건강보험법 시행령 제41·44조, 별표 4, 시행규칙 제44조·별표 1의2, 2026 요율) · 재산세 과세표준(지방세법 시행령 제109조②)",
+  "cases": [
+    { "fn": "property.houseTaxBase", "input": [0, false], "expect": 0, "source": "A", "note": "공시가격 0 → 0" },
+    { "fn": "property.houseTaxBase", "input": [300000000, false], "expect": 129000000, "source": "A", "note": "1주택 3억 이하 43%" },
+    { "fn": "property.houseTaxBase", "input": [300000001, false], "expect": 132000000.44, "source": "A", "note": "3억 초과 44% (공시가격 전체에 곱함)" },
+    { "fn": "property.houseTaxBase", "input": [500000000, false], "expect": 220000000, "source": "A", "note": "5억 × 44% (pension-tax-sim test)" },
+    { "fn": "property.houseTaxBase", "input": [600000000, false], "expect": 264000000, "source": "A", "note": "6억 × 44%" },
+    { "fn": "property.houseTaxBase", "input": [600000001, false], "expect": 270000000.45, "source": "A", "note": "6억 초과 45%" },
+    { "fn": "property.houseTaxBase", "input": [500000000, true], "expect": 300000000, "source": "A", "note": "2주택 이상 60%" },
+
+    { "fn": "nhis.propertyPoints", "input": [100000000], "expect": 0, "source": "A", "note": "과세표준 − 1억 = 0 → 0점" },
+    { "fn": "nhis.propertyPoints", "input": [104500000], "expect": 22, "source": "A", "note": "공제 후 450만 → 1등급 22점" },
+    { "fn": "nhis.propertyPoints", "input": [104500001], "expect": 44, "source": "A", "note": "450만 초과 → 2등급 44점" },
+    { "fn": "nhis.propertyPoints", "input": [220000000], "expect": 490, "source": "A", "note": "공제 후 1.2억 → 20등급 490점" },
+    { "fn": "nhis.propertyPoints", "input": [7881240000], "expect": 2271, "source": "A", "note": "공제 후 77억 8,124만 → 59등급" },
+    { "fn": "nhis.propertyPoints", "input": [7881240001], "expect": 2341, "source": "A", "note": "그 초과 60등급 2,341점" },
+
+    { "fn": "nhis.finCounted", "input": [10000000], "expect": 0, "source": "A", "note": "이자·배당 1,000만 이하 → 건보 소득 제외" },
+    { "fn": "nhis.finCounted", "input": [10000001], "expect": 10000001, "source": "A", "note": "1,000만 초과 → 전액" },
+    { "fn": "nhis.finCounted", "input": [12000000, { "counted": 12100000 }], "expect": 12100000, "source": "A", "note": "종합과세면 그로스업 포함액(시행규칙 제44조①2호)" },
+    { "fn": "nhis.finCounted", "input": [10000001, { "k": 1.1 }], "expect": 10000001, "source": "A", "note": "k = 1.1: 기준 1,000만 ÷ 1.1과 비교(오늘 돈 가치 입력)" },
+
+    { "fn": "nhis.premium", "input": [280000, { "regional": true }], "expect": { "health": 20160, "ltc": 2640, "monthly": 22800, "atFloor": true }, "source": "A", "note": "소득월액 28만 이하 → 하한 20,160, 장기요양 20,160 × 0.9448/7.19 = 2,649.1 → 2,640" },
+    { "fn": "nhis.premium", "input": [280001, { "regional": true }], "expect": { "health": 20160, "atFloor": true }, "source": "A", "note": "280,001 × 7.19% = 20,132 < 하한 → 하한" },
+    { "fn": "nhis.premium", "input": [280389, { "regional": true }], "expect": { "health": 20160, "atFloor": true }, "source": "A", "note": "280,389 × 7.19% = 20,159.97 < 하한 → 하한" },
+    { "fn": "nhis.premium", "input": [280390, { "regional": true }], "expect": { "health": 20160, "atFloor": false }, "source": "A", "note": "280,390 × 7.19% = 20,160.04 → 10원 미만 버림 20,160 (하한 아님)" },
+    { "fn": "nhis.premium", "input": [280390, { "regional": true, "trunc": false }], "expect": { "health": 20160.041 }, "source": "A", "note": "버림 끄면 20,160.041" },
+    { "fn": "nhis.premium", "input": [1000000, { "regional": false }], "expect": { "health": 71900, "ltc": 9440, "monthly": 81340 }, "source": "A", "note": "100만 × 7.19% = 71,900, 장기요양 71,900 × 0.9448/7.19 = 9,448 → 9,440" },
+    { "fn": "nhis.premium", "input": [0, { "regional": false }], "expect": { "health": 0, "ltc": 0 }, "source": "A", "note": "직장가입자 쪽은 하한 없음" },
+    { "fn": "nhis.premium", "input": [63862866, { "regional": true }], "expect": { "health": 4591740, "ltc": 603370, "atCap": true }, "source": "A", "note": "63,862,866 × 7.19% = 4,591,740.07 > 상한 → 상한 4,591,740, 장기요양 603,370.5 → 603,370" },
+    { "fn": "nhis.premium", "input": [63862865, { "regional": true }], "expect": { "health": 4591730, "atCap": false }, "source": "A", "note": "63,862,865 × 7.19% = 4,591,739.99 < 상한 → 10원 미만 버림 4,591,730" },
+
+    { "fn": "nhis.regional", "input": [{}], "expect": { "income": 0, "incPrem": 20160, "propPrem": 0, "health": 20160, "ltc": 2640, "total": 22800, "floor": true }, "source": "A", "note": "소득·재산 0 → 하한" },
+    { "fn": "nhis.regional", "input": [{ "pub": [6725000] }], "expect": { "m": 280208.3333333333, "incPrem": 20160, "floor": true }, "source": "A", "note": "공적연금 672.5만 × 50% ÷ 12 = 280,208 × 7.19% = 20,147 < 하한 → 20,160" },
+    { "fn": "nhis.regional", "input": [{ "pub": [6730000] }], "expect": { "incPrem": 20160, "floor": false }, "source": "A", "note": "280,417 × 7.19% = 20,161.96 → 버림 20,160" },
+    { "fn": "nhis.regional", "input": [{ "pub": [21600000], "taxBase": 220000000 }], "expect": { "incPrem": 64710, "propPrem": 103630, "health": 168340, "ltc": 22120, "total": 190460 }, "source": "A", "note": "1,080만÷12×7.19% = 64,710 · 490점×211.5 = 103,635 → 103,630 · 장기요양 168,340×0.9448/7.19 = 22,120.7 → 22,120 (pension-tax-sim test)" },
+    { "fn": "nhis.regional", "input": [{ "pub": [13728000], "fin": [0], "taxBase": 220000000 }], "expect": { "incPrem": 41120, "propPrem": 103630, "total": 163770 }, "source": "A", "note": "686.4만÷12×7.19% = 41,126.8 → 41,120, 장기요양 144,750 → 19,020 (retire-drawdown test)" },
+    { "fn": "nhis.regional", "input": [{ "fin": [10000000, 12000000] }], "expect": { "income": 12000000 }, "source": "A", "note": "금융소득 1인별 판정: 1,000만은 제외, 1,200만은 전액" },
+    { "fn": "nhis.regional", "input": [{ "pub": [10000000], "wage": [10000000] }], "expect": { "income": 10000000 }, "source": "A", "note": "근로소득도 공적연금처럼 50%" },
+
+    { "fn": "nhis.employeeExtra", "input": [{ "fin": 20000000 }], "expect": { "m": 0, "health": 0 }, "source": "A", "note": "보수 외 소득 2,000만 이하 → 0" },
+    { "fn": "nhis.employeeExtra", "input": [{ "fin": 30000000 }], "expect": { "m": 833333.3333333334, "health": 59910, "ltc": 7870 }, "source": "A", "note": "(3,000만 − 2,000만) ÷ 12 × 7.19% = 59,916.7 → 59,910, 장기요양 7,872.4 → 7,870" },
+    { "fn": "nhis.employeeExtra", "input": [{ "fin": 20000000, "pension": 20000000 }], "expect": { "S": 40000000, "ev": 30000000, "m": 1250000 }, "source": "A", "note": "S 4,000만, 반영 소득 = 2,000만 + 2,000만×50% → (S − 2,000만)÷12 × 3/4" },
+
+    { "fn": "nhis.dependent", "input": [[{ "pub": 20000000 }]], "expect": { "ok": true }, "source": "A", "note": "소득 2,000만 이하 → 피부양자" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 20000001 }]], "expect": { "ok": false }, "source": "A", "note": "2,000만 초과 → 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 21600000 }, { "pub": 0 }]], "expect": { "ok": false, "incAll": false }, "source": "A", "note": "소득 요건은 부부 함께 → 배우자도 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 10000001, "taxBase": 540000000 }]], "expect": { "ok": true }, "source": "A", "note": "재산 5.4억 이하면 소득 1,000만 넘어도 재산 요건 통과" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 10000000, "taxBase": 540000001 }]], "expect": { "ok": true }, "source": "A", "note": "5.4억 초과 ~ 9억: 소득 1,000만 이하면 통과" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 10000001, "taxBase": 540000001 }]], "expect": { "ok": false }, "source": "A", "note": "5.4억 초과 + 소득 1,000만 초과 → 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 0, "taxBase": 900000000 }]], "expect": { "ok": true }, "source": "A", "note": "9억 이하·소득 0 → 통과" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 0, "taxBase": 900000001 }]], "expect": { "ok": false }, "source": "A", "note": "9억 초과 → 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 18000000, "taxBase": 600000000 }, { "pub": 0 }]], "expect": { "ok": false, "people": [{ "ok": false }, { "ok": true }] }, "source": "A", "note": "재산 요건은 각자: 본인 탈락, 배우자 유지 (pension-tax-sim test)" },
+    { "fn": "nhis.dependent", "input": [[{ "fin": 10000000, "pub": 15000000 }]], "expect": { "ok": true, "people": [{ "inc": 15000000 }] }, "source": "A", "note": "금융소득 1,000만 이하는 소득에서 빠짐" },
+    { "fn": "nhis.dependent", "input": [[{ "other": 5000000 }]], "expect": { "ok": true }, "source": "A", "note": "사업소득(미등록·주택임대 아님) 500만 이하 통과" },
+    { "fn": "nhis.dependent", "input": [[{ "other": 5000001 }]], "expect": { "ok": false }, "source": "A", "note": "500만 초과 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "other": 1, "bizReg": true }]], "expect": { "ok": false }, "source": "A", "note": "사업자등록·주택임대소득 있으면 1원도 탈락" },
+    { "fn": "nhis.dependent", "input": [[{ "pub": 20000000 }], { "k": 1.1 }], "expect": { "ok": false }, "source": "A", "note": "k = 1.1: 오늘 돈 2,000만 = 명목 2,200만 → 탈락" }
+  ]
+}

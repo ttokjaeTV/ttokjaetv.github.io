@@ -9,6 +9,7 @@
  *   --rules: 검증할 rules.js (기본 ../v2026.1/rules.js)
  *   --allow-missing: 코드에서 패턴을 못 찾은 항목(= 이미 TTOKJAE_RULES로 옮겼거나 코드가 바뀜)을 실패로 치지 않음
  *   --only: 일치(OK) 행은 표에서 빼고 출력
+ *   --self-only: 계산기 코드 대조는 건너뛰고 맨 아래 'rules.js 자체' 행만 (계산기 clone 없는 허브 CI용)
  *
  * 결과: 표 출력, 불일치(또는 --allow-missing 없이 '없음')가 하나라도 있으면 종료 코드 1.
  * 이 검사는 "이관 전 계산기 리터럴 = rules.js" 기준선이다. 계산기를 TTOKJAE_RULES로 옮긴 뒤에는
@@ -27,6 +28,7 @@ const REPOS = path.resolve(positional[0] || process.env.TTOKJAE_REPOS || path.jo
 const RULES_PATH = path.resolve(opt('--rules', path.join(__dirname, '../v2026.1/rules.js')));
 const ALLOW_MISSING = flag('--allow-missing');
 const ONLY_BAD = flag('--only');
+const SELF_ONLY = flag('--self-only');
 
 const R = require(RULES_PATH);
 if (!R || !R.meta) { console.error('rules.js를 읽지 못했습니다: ' + RULES_PATH); process.exit(2); }
@@ -328,7 +330,7 @@ function extract(text, how) {
 
 const rows = [];
 let bad = 0, missing = 0, ok = 0;
-for (const c of C) {
+for (const c of SELF_ONLY ? [] : C) {
   const expect = c.expect();
   for (let f of c.files) {
     const optional = f.endsWith('?'); f = f.replace(/\?$/, '');
@@ -372,7 +374,7 @@ const shown = ONLY_BAD ? rows.filter(r => r[6] !== 'OK') : rows;
 const wid = s => [...String(s)].reduce((w, ch) => w + (/[ᄀ-ᇿ　-鿿가-힯＀-￯]/.test(ch) ? 2 : 1), 0);
 const W = head.map((h, i) => Math.min(48, Math.max(wid(h), ...shown.map(r => wid(r[i])))));
 const pad = (s, w) => { s = String(s); while (wid(s) > w) s = [...s].slice(0, -2).join('') + '…'; return s + ' '.repeat(Math.max(0, w - wid(s))); };
-console.log(`rules.js v${R.meta.version} (${RULES_PATH})\n계산기 clone: ${REPOS}\n`);
+console.log(`rules.js v${R.meta.version} (${RULES_PATH})\n계산기 clone: ${SELF_ONLY ? '(--self-only: 대조 안 함)' : REPOS}\n`);
 console.log(head.map((h, i) => pad(h, W[i])).join(' | '));
 console.log(W.map(w => '-'.repeat(w)).join('-+-'));
 for (const r of shown) console.log(r.map((x, i) => pad(x, W[i])).join(' | '));

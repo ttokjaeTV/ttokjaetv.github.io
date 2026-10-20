@@ -1,0 +1,57 @@
+# 허브 자체 자동 검사 — 공용 기준값(rules)·채움 도우미(fill)·계산 엔진(calc)을 고칠 때마다 돈다.
+#  1. fill-v1.js 시험 (설치된 rules 버전 전부)
+#  2. calc-v1.js 기준 답안 시험 (v2026.2 이상 rules 버전 전부, 옛 버전은 bind 거부 확인)
+#  3. rules.js 자체 일관성 (국세×1.1 = 지방세 포함 세율, 누진공제·공제표 연속성, 60등급, 동결) — 버전 전부
+#  4. 공용 엔진(calc-v*.js)에 제도 숫자 하드코딩 없음
+#  5. 불변 검사: 이미 커밋돼 있던 rules/v*/ 파일, rules/fill-v*.js, rules/calc-v*.js가 이번 push·PR에서 수정·삭제되면 실패 (새 파일 추가는 허용)
+# 계산기 clone이 필요한 검사(check-values.js 대조, calc-compare.js)는 여기서 돌리지 않는다.
+name: 허브 공용 파일 검사
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: fill-v1.js 시험
+        run: |
+          for f in rules/v*/rules.js; do node rules/tests/fill-test.js --rules "$f" || exit 1; done
+
+      - name: calc-v1.js 기준 답안 시험
+        run: node rules/tests/calc-test.js
+
+      - name: rules.js 자체 일관성
+        run: |
+          for f in rules/v*/rules.js; do node rules/tests/check-values.js --rules "$f" --self-only || exit 1; done
+
+      - name: 공용 엔진 하드코딩 검사
+        run: |
+          for f in rules/calc-v*.js; do node rules/tools/scan-hardcoded.js "$f" --fail-on-hit || exit 1; done
+
+      - name: 불변 검사 (배포한 rules·fill·calc 파일)
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          base="${PR_BASE:-$PUSH_BEFORE}"
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            base="$(git rev-parse HEAD~1 2>/dev/null || true)"
+          fi
+          if [ -z "$base" ]; then echo "비교할 이전 커밋 없음 → 건너뜀"; exit 0; fi
+          node rules/tools/check-immutable.js "$base" HEAD

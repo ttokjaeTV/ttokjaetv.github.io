@@ -2,6 +2,13 @@
 
 배포한 버전 폴더는 고치지 않습니다. 바뀐 값은 새 버전 폴더로 내고 여기에 적습니다. (정책: `README.md` "버전 정책")
 
+## calc-v1.js — 2026-10-20 (값 변경 없음)
+
+- 공용 계산 엔진 추가(`rules/calc-v1.js`, 전역 `TTOKJAE_CALC`, `bind(R)` — rules v2026.2 이상). 누진세·한계세율·연금소득공제·연금소득 종합과세(표준세액공제·경로우대·물가 배수 kx)·배우자공제 소득요건·퇴직소득세·연금소득세율·퇴직소득세 감면 비율·연금수령연차·수령한도·과세 방식 선택·주택 과세표준·재산 점수·건보 금융소득 판정·건보료(지역·직장 보수 외, 10원 버림)·피부양자·금융소득종합과세·해외주식 양도세·호가·거래세·국민연금 개시 나이·조기·연기 조정률. 함수 표는 README.
+- 연산 순서는 2026-10-20 계산기 식과 같음: pension-tax-sim·retire-drawdown·fin-income-tax·etf-vs-direct·overseas-stock-tax·trading-cost·nps-calc의 git HEAD 함수와 무작위·경계값 비교 Object.is 일치(`tests/calc-compare.js`).
+- 시험 `tests/calc-test.js` + `tests/calc-cases/*.json`(법령 손계산 A·공개 예시 C·회귀값 D), 허브 자동 검사 `.github/workflows/hub-check.yml`(불변 검사 `tools/check-immutable.js` 포함).
+- 도구: `scan-hardcoded.js`가 파일 경로 인자를 받음, `check-values.js --self-only`('rules.js 자체' 행만).
+
 ## v2026.2 — 2026-10-20
 
 v2026.1 값은 모두 그대로이고 키만 추가했습니다(옮겨도 결과가 바뀌지 않음). 계산기는 새 키가 필요할 때만 올리면 됩니다.

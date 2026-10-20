@@ -4,6 +4,7 @@
  * TTOKJAE_RULES로 옮긴 뒤 남은 리터럴 확인(이관 검증)과, 나중에 누가 숫자를 다시 박아 넣는 것(회귀) 잡기에 쓴다.
  *
  *   node rules/tools/scan-hardcoded.js <repo 경로> [<repo 경로> …] [옵션]
+ *   node rules/tools/scan-hardcoded.js <파일.js|파일.html> …          (파일 하나만, 예: rules/calc-v1.js)
  *   node rules/tools/scan-hardcoded.js --all <clone 폴더>            (하위 폴더 전부)
  *
  * 옵션
@@ -265,6 +266,7 @@ function scanFile(fp, rel) {
 }
 
 function filesOf(repo) {
+  if (fs.existsSync(repo) && fs.statSync(repo).isFile()) return [repo];   // 파일 경로를 직접 준 경우
   const out = [];
   const idx = path.join(repo, 'index.html');
   if (fs.existsSync(idx)) out.push(idx);
@@ -284,7 +286,7 @@ const result = [];
 for (const repo of repos) {
   const name = path.basename(path.resolve(repo));
   const hits = [];
-  for (const fp of filesOf(repo)) hits.push(...scanFile(fp, path.relative(repo, fp).replace(/\\/g, '/')));
+  for (const fp of filesOf(repo)) hits.push(...scanFile(fp, (path.relative(repo, fp) || path.basename(fp)).replace(/\\/g, '/')));
   hits.sort((a, b) => (a.file === b.file ? a.line - b.line : a.file < b.file ? -1 : 1));
   result.push({ repo: name, path: path.resolve(repo), hits });
 }

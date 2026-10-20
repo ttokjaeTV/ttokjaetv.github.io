@@ -17,6 +17,11 @@
 | `rules/tools/scan-hardcoded.js` | 계산기 코드에 rules.js 값이 숫자로 박혀 있는 곳을 file:line으로 나열(이관 검증·회귀 감시) |
 | `rules/fill-v1.js` | 정적 HTML 설명 문구의 숫자를 rules 값으로 채우는 도우미(`data-rule` 속성). 계산은 안 하고 글자만 바꿈. 배포 후 고치지 않음(바꿀 일이 생기면 `fill-v2.js`) |
 | `rules/tests/fill-test.js` | fill-v1.js 식 계산·표시 형식 시험 |
+| `rules/calc-v1.js` | 공용 계산 엔진(전역 `TTOKJAE_CALC`, `TTOKJAE_CALC.bind(TTOKJAE_RULES)`): 누진세·연금소득공제·종합과세·퇴직소득세·연금 인출 과세·건보료·피부양자·금융소득종합과세·해외주식 양도세·거래세·호가·국민연금 개시 나이. rules v2026.2 이상 필요. 배포 후 고치지 않음(바꿀 일이 생기면 `calc-v2.js`) |
+| `rules/tests/calc-test.js`, `rules/tests/calc-cases/*.json` | calc-v1.js 기준 답안 시험(법령 손계산·공개 예시·회귀값) + 구조 시험 |
+| `rules/tests/calc-compare.js` | calc-v1.js ↔ 계산기 기존 구현(git HEAD) 무작위·경계값 비교 (계산기 clone 필요, 계산기를 엔진으로 옮기기 전에 돌림) |
+| `rules/tools/check-immutable.js` | 배포한 `rules/v*/`·`fill-v*.js`·`calc-v*.js`가 수정·삭제되지 않았는지 (허브 CI) |
+| `.github/workflows/hub-check.yml` | 허브 자동 검사(push·PR): fill 시험, calc 시험, rules.js 자체 일관성, calc 하드코딩, 불변 검사 |
 
 ## 구조 (v2026.1)
 
@@ -123,6 +128,85 @@ TTOKJAE_RULES
 | TC `KR_TAX` / `TAF_MAX` / `DEF.sec`·`DEF.taf` / `krTick()` | `TRADE.securitiesTransactionTax` / `tafMaxUsd` / `secFeePerMillionUsd`·`tafPerShareUsd` / `krxTick`·`krxEtfTick` |
 | 물가 기본값 2.5 | `MARKET_DEFAULTS.inflation` (× 100) |
 
+## 공용 계산 엔진 (`calc-v1.js`)
+
+rules.js가 숫자만 들고 있다면, calc-v1.js는 그 숫자로 하는 **법에 정해진 계산**(세액·공제·건보료·한도·호가)을 한 곳에 둡니다.
+계산기마다 같은 식을 따로 적어 두던 것(누진세 표 돌기, 연금소득공제, 퇴직소득세, 건보료 10원 버림 …)을 이 함수로 부르면 식이 하나가 됩니다.
+
+```html
+<script src="https://ttokjaetv.github.io/rules/v2026.2/rules.js"></script>
+<script src="https://ttokjaetv.github.io/rules/fill-v1.js"></script>
+<script src="https://ttokjaetv.github.io/rules/calc-v1.js"></script>   <!-- rules.js 다음, 계산기 엔진보다 먼저 -->
+<script>
+if (!window.TTOKJAE_RULES || !window.TTOKJAE_CALC) {
+  var TJR_MSG = !window.TTOKJAE_RULES ? '기준값 파일(rules.js)을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요.'
+    : '계산 엔진 파일(calc-v1.js)을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요.';
+  /* … 기존 안내 블록 그대로 (tjrShow, throw) … */
+}
+const TR = TTOKJAE_RULES;
+const CALC = TTOKJAE_CALC.bind(TR);            // 이름은 계산기 안에서 겹치지 않게. 같은 R이면 같은 객체(캐시)
+CALC.retirementTax.calc(3e8, 30).national      // 9,862,500
+</script>
+```
+
+- 전역은 `TTOKJAE_CALC` 하나(`{ version: 'calc-v1', bind(R) }`), Node는 `module.exports`. 엔진은 전역 `TTOKJAE_RULES`를 직접 보지 않고 `bind(R)`로 받은 값만 씁니다.
+- `bind(R)`는 필요한 키를 모두 확인합니다. 없으면 `rules v2026.2 이상 필요: <키> 없음` 오류(v2026.1은 `INCOME_TAX.dependentIncomeLimit`이 없어 거부).
+- 시뮬레이터(연도별 인출·적립, 인출 순서 탐색)와 계산기 관례는 넣지 않습니다. 관례는 계산기 몫이고, 똑재TV 계산기 공통 관례는 다음과 같습니다.
+  - **'○세까지 계획'은 그 나이 해까지 포함**(retire-drawdown·freedom·retire-check·retirement 통일).
+  - **실질(오늘 돈) 환산은 연말 잔액을 그해 연말 물가 지수로** 나눔.
+  - 세법 기준금액 물가연동(kx)·건보 명목 기준(k)은 계산기가 켜고 끄는 옵션입니다(엔진은 받은 배수로 계산만).
+- 숫자 리터럴로 제도 값을 두지 않습니다(0·1·12개월·1e4 만원·1e-9 끝수 오차만, `calc-test.js`가 검사). DOM·fetch·Date·console을 쓰지 않습니다.
+- **부동소수 연산 순서**는 2026-10-20 계산기 식과 같게 맞췄습니다(retire-drawdown은 인출 순서 18개 후보 점수로 하나를 골라 마지막 비트 차이도 결과를 뒤집을 수 있음). 계산기를 옮길 때는 `tests/calc-compare.js`로 기존 함수와 Object.is 일치를 먼저 확인하고, 옛 이름·인자·단위는 얇은 껍데기 함수로 남깁니다.
+
+### 함수 (calc-v1)
+
+금액 원, 비율 0~1, 나이 만 나이. `national` = 국세, `total` = 지방소득세 포함.
+
+| 함수 | 결과 | 옵션·비고 |
+|---|---|---|
+| `incomeTax.basic(base)` | 산출세액(국세) | 0 이하·NaN → 0 |
+| `incomeTax.marginalRate(base)` | 한계세율 | 0 이하 → 첫 구간 |
+| `incomeTax.pensionDeduction(total)` | 연금소득공제(한도 900만 포함) | |
+| `incomeTax.comprehensive({pension, otherIncome, age, extraDeduction, standardCredit, kx})` | `{pensionTotal, pensionDeduction, income, deduction, base, calc, credit, national, local, total, kx}` | `pension`: 숫자 또는 `[공적, 사적, …]`(합산). 과세표준 = max(0, 소득금액 − (기본공제 + 70세 이상 경로우대) − extraDeduction). `standardCredit`: 기본 true(7만원), false, 또는 금액. `kx`: 금액을 ÷kx로 계산하고 `total`만 ×kx(다른 필드는 ÷kx 기준) |
+| `incomeTax.dependentIncomeOk(income)` | 참거짓 | 배우자·부양가족 기본공제 소득요건(소득금액 100만 이하) |
+| `retirementTax.calc(severance, years)` | `{years, serviceDed, converted, convDed, base, national, total}` | 근속연수 올림·최소 1년 |
+| `pension.rate(age, {withLocal})` | 연금소득세율 | 기본 국세(5·4·3%), `withLocal`이면 5.5·4.4·3.3% 표(국세×1.1과 끝자리 다를 수 있음). NaN → undefined |
+| `pension.retireRatio(paidYears)` | 퇴직소득세 납부 비율 0.7·0.6·0.5 | 실제 수령연차 |
+| `pension.limitYear({age, startAge, pre2013})` | 연금수령연차 | `startAge` 기본 `PENSION.minAge`, `pre2013`이면 6년차부터 |
+| `pension.payoutLimit(balance, limitYear)` | 연금수령한도 | 11년차부터 Infinity |
+| `pension.privateTaxChoice({amount, age, comp, kx})` | `{tax, method: 'comp'\|'low'\|'sep', alt, limit}` | `comp` = 종합과세로 늘어나는 세액(지방세 포함, 계산기가 계산). 1,500만(×kx) 이하 저율, 초과 16.5% 분리과세와 비교해 작은 쪽(같으면 분리과세) |
+| `property.houseTaxBase(gongsi, multi)` | 주택 재산세 과세표준 | 1주택 43·44·45%, 다주택 60% |
+| `nhis.propertyPoints(taxBase)` | 재산 부과점수 | |
+| `nhis.finCounted(fin, {counted, k})` | 건보 반영 이자·배당 | 1,000만(÷k) 초과면 `counted`(기본 fin; 종합과세면 그로스업 포함액), 아니면 0 |
+| `nhis.premium(m, {regional, trunc})` | `{health, ltc, monthly, annual, atFloor, atCap}` | 소득월액 → 보험료. `regional`(기본 false)이면 하한. `trunc: false`면 10원 버림 안 함 |
+| `nhis.regional({pub, wage, fin, other, taxBase, k, trunc})` | `{income, m, incPrem, pts, propPrem, health, ltc, total, floor, atCap}` | 공적연금·근로 50%, 금융 1인별 1,000만 판정(엔진이 거름), 소득분·재산분 각각 버림 → 장기요양 다시 버림 |
+| `nhis.employeeExtra({fin, biz, wage, pension, trunc})` | `{S, ev, m, health, ltc, monthly, annual, atFloor, atCap}` | 직장가입자 보수 외 소득 2,000만 초과분 |
+| `nhis.dependent(people, {k})` | `{people: [{inc, biz, bizReg, tb, bizOk, incOk, propOk, ok}], incAll, ok}` | 사람 `{pub, wage, fin, other(사업소득), bizReg, taxBase}`. 소득 요건 부부 함께, 재산 각자. 기준 금액 ÷k |
+| `finIncome.tax({interest, divGU, divOther, otherBase, hasWage, year})` | fin-income-tax `finTax`와 같은 필드(`extra`, `extraTotal`, `A`, `B`, `gu`, `dc`, `stdc` …) | 그로스업율 `grossUpByYear[year]`(기본 `meta.year`, 표 밖이면 가까운 끝 해) |
+| `overseasStock.tax(gain, {otherGain, riaDeduction, roundWon, incremental})` | `{base, national, local, tax}` (`incremental`이면 `{tax}`) | `roundWon`: 원 단위 반올림·원 미만 버림(overseas-stock-tax). `incremental`: otherGain 위에 gain을 더해 늘어나는 세액(etf-vs-direct) |
+| `trade.tick(kind, price)` | 호가 단위 | `'krx'`(기본)·`'etf'`·`'us'` |
+| `trade.krSellTax(amount, market, {floor})` | `{stt, rural, tax}` | `market`: kospi·kosdaq·konex·etf. 기본 원 미만 버림 |
+| `nps.startAge(birthYear)` | 노령연금 수급개시연령 | |
+| `nps.timingFactor(offset, {clamp})` | 조기·연기 조정률 | `clamp`면 최대 5년(nps-calc), 아니면 그대로(retire-drawdown) |
+
+계산기마다 다른 동작(10원 버림·표준세액공제·물가 배수·금융소득 거르는 시점)은 옵션으로 둡니다. 옵션 기본값은 2026-10-20에 통일한 기준(10원 버림 켬, 표준세액공제 켬)입니다.
+
+### 시험
+
+```bash
+node rules/tests/calc-test.js                 # 설치된 rules 버전 전부 (v2026.2 미만은 bind 거부 확인)
+node rules/tests/calc-test.js --rules rules/v2026.2/rules.js --verbose
+node rules/tests/calc-compare.js [--repos <계산기 폴더>] [--n 5000]   # 계산기 git HEAD 함수와 Object.is 비교
+node rules/tools/scan-hardcoded.js rules/calc-v1.js --fail-on-hit
+```
+
+`calc-cases/*.json`은 `{ "year": 2026, "cases": [{ fn, input, expect, source, note, tol?, exact? }] }`. 등급 `source`: A 법령 손계산(식을 note에) · B 공식 모의계산 · C 금융사 공개 예시 · D 현재 계산기 출력 회귀값(정답 아님, `exact`). 그해(`year`) 법령 값으로 만든 답이라 rules `meta.year`가 다르면 건너뜁니다. 새해 rules를 내면 새 연도 사례 파일을 추가합니다.
+
+### 버전 정책 (calc)
+
+- `calc-v1.js`는 배포 후 **고치지 않습니다**(rules 버전 폴더와 같음, 허브 CI 불변 검사가 막음). 계산 방식·옵션 기본값·연산 순서를 바꿀 일이 생기면 `calc-v2.js`를 새로 내고, 계산기가 하나씩 옮깁니다.
+- 새 rules 버전(v2026.3, v2027.1 …)은 calc-v1과 같이 씁니다. 키를 빼거나 이름을 바꾸지 않는 한(rules 버전 정책 5) calc-v1이 그대로 읽습니다. 새 키가 꼭 필요한 계산은 calc-v2에서.
+
 ## Node·테스트에서 쓰기
 
 ```js
@@ -141,16 +225,22 @@ https.get('https://ttokjaetv.github.io/rules/v2026.1/rules.js', res => {
 ```
 
 계산기 `src/test.js`에서 브라우저처럼 전역으로 쓰는 엔진을 시험할 때는 `global.TTOKJAE_RULES = require(…)`를 엔진보다 먼저 실행합니다.
+calc-v1.js를 쓰는 계산기는 같은 로더로 `global.TTOKJAE_CALC`도 엔진보다 먼저 둡니다(retire-drawdown `src/test.js` 참고: 페이지의 `<script src>`에서 `rules/v…/rules.js`와 `rules/calc-v….js` 경로를 읽고, 위쪽 폴더의 허브 clone → 없으면 고정 주소 순으로 찾음). 자동 검사(rules-guard)는 허브를 저장소 안 `ttokjaetv.github.io/`에 받아 두므로 clone 경로로 찾습니다. **그래서 새 calc 파일은 허브에 먼저 배포한 뒤 계산기를 배포합니다.**
 
 ### 검증 도구
 
 ```bash
 # rules.js ↔ 계산기 코드 값 대조 (clone 폴더 기본값: ../../../_점검/calc-verify/consistency/repos 또는 환경변수 TTOKJAE_REPOS)
 node rules/tests/check-values.js [clone 폴더] [--rules rules/v2026.2/rules.js] [--only] [--allow-missing]
+node rules/tests/check-values.js --rules rules/v2026.2/rules.js --self-only   # 'rules.js 자체' 행만 (clone 없이, 허브 CI)
 
 # 하드코딩 남은 곳 (이관 진행 확인·회귀 감시)
 node rules/tools/scan-hardcoded.js --all <clone 폴더> [--summary] [--text] [--json 결과.json] [--fail-on-hit]
 node rules/tools/scan-hardcoded.js <repo 경로> …
+node rules/tools/scan-hardcoded.js rules/calc-v1.js --fail-on-hit                # 파일 하나만 (공용 엔진 검사)
+
+# 배포한 공용 파일 불변 검사 (허브 CI와 같음)
+node rules/tools/check-immutable.js <기준 커밋> [<대상 커밋>]                    # 대상 생략 = 작업 폴더
 ```
 
 - `check-values.js`는 **이관 전 기준선**입니다. 계산기가 리터럴 대신 `TTOKJAE_RULES`를 읽게 바뀌면 그 항목은 '패턴 없음'이 되는 게 정상이므로 `--allow-missing`으로 돌립니다. 맨 아래 "rules.js 자체" 행(국세×1.1 = 지방세 포함 세율, 누진공제 연속성, 60등급, 동결 여부)은 항상 통과해야 합니다.
@@ -164,7 +254,8 @@ node rules/tools/scan-hardcoded.js <repo 경로> …
    - 새해 기준값: `v2027.1`
 3. 계산기는 자기 `<script src>`의 버전 번호를 올리고, 결과가 어떻게 달라지는지 확인한 뒤 배포합니다. 계산기마다 따로 올려도 됩니다(옛 버전 폴더는 계속 남아 있음).
 4. 옛 버전 폴더는 지우지 않습니다(옛 버전을 고정한 계산기·북마크가 깨짐).
-5. 키 이름을 바꾸거나 빼는 변경은 하지 않는 것을 원칙으로 합니다. 꼭 필요하면 새 버전에서 새 키를 추가하고 옛 키를 한동안 같이 둡니다.
+5. 키 이름을 바꾸거나 빼는 변경은 하지 않는 것을 원칙으로 합니다. 꼭 필요하면 새 버전에서 새 키를 추가하고 옛 키를 한동안 같이 둡니다. (calc-v1.js가 읽는 키를 빼면 그 버전에서 `bind`가 거부합니다.)
+6. `fill-v1.js`·`calc-v1.js`도 같습니다. 배포 후 고치지 않고 `fill-v2.js`·`calc-v2.js`로 냅니다. 허브 자동 검사(`hub-check.yml`)의 불변 검사가 이미 커밋된 `rules/v*/`·`fill-v*.js`·`calc-v*.js`의 수정·삭제를 실패로 막습니다(새 파일 추가는 통과).
 
 ## 해마다 갱신하는 순서 (예: 2027년)
 
@@ -190,7 +281,7 @@ node rules/tools/scan-hardcoded.js <repo 경로> …
 값은 같아도 계산 방식이 다른 곳은 그대로입니다(점검 inventory §8·§9).
 
 - 지역 건보 하한: 20,160 ÷ 7.19% = 280,389원이라 소득월액 28만~28.04만 구간은 `max(하한, 소득월액 × 요율)` 가드가 필요(FIT·EVD·PTS·RDD 모두 2026-10-19 기준 반영, 새 계산기도 같은 가드를 둘 것).
-- 10원 미만 절사: FIT·EVD만 적용(`NHIS.truncUnit`), PTS·RDD는 절사 없음.
-- 표준세액공제 7만원: PTS·RDD는 차감, FIT·EVD는 미적용.
+- 10원 미만 절사: 2026-10-20부터 FIT·EVD·PTS·RDD 모두 적용(소득분·재산분 각각, 장기요양은 버린 건강보험료 기준으로 다시 버림). calc-v1 `nhis.*`의 기본값.
+- 표준세액공제 7만원: 2026-10-20부터 PTS·RDD·FIT·EVD 모두 차감(근로소득 없는 경우). calc-v1 `incomeTax.comprehensive`·`finIncome.tax`의 기본값.
 - 세액공제율 기본 선택값: isa-maturity 13.2%, retire-check 16.5%.
 - trading-cost는 코넥스를 선택지에 두지 않음(rules에는 `konex` 있음).

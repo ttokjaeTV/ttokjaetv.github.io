@@ -1,0 +1,22 @@
+{
+  "year": 2026,
+  "about": "현재 계산기 출력 회귀값(D) — 정답이 아니라 엔진이 지금 계산기와 같은 값을 내는지 보는 기준. 계산기 동작을 바꾸면(D 단계) 같이 고친다.",
+  "cases": [
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[16126996.552129466,0],"extraDeduction":0,"kx":1.3439163793441222}],"expect":{"total":304531.4515593781},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 compTax(공적÷kx, 사적÷kx, 0)×kx"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[21502662.069505956,12095247.4140971],"extraDeduction":1500000,"kx":1.3439163793441222}],"expect":{"total":1271344.8948595398},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 compTax(공적÷kx, 사적÷kx, 1500000)×kx"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[23456789.5,12345678.25],"extraDeduction":2500000,"kx":1.6386164402903942}],"expect":{"total":1037969.8214210621},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 compTax(공적÷kx, 사적÷kx, 2500000)×kx"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[0,31000000],"extraDeduction":1000000,"kx":1}],"expect":{"total":1919500.0000000002},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 compTax(공적÷kx, 사적÷kx, 1000000)×kx"},
+    {"fn":"nhis.regional","input":[{"pub":[8377799.50356603,5492438.485729477],"fin":[7933522.2571648015,2441083.7714353236],"other":1234567.8,"taxBase":360000000,"ix":1.6386164402903942,"k":1.6386164402903942}],"expect":{"income":16103209.051812556,"incPrem":96480,"propPrem":139370,"health":235850,"ltc":30990,"total":266840},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 nhRegional"},
+    {"fn":"nhis.regional","input":[{"pub":[33333333.3],"fin":[10000000.5],"taxBase":720000000}],"expect":{"income":26666667.15,"incPrem":159770,"propPrem":186330,"health":346100,"ltc":45470,"total":391570},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 nhRegional"},
+    {"fn":"nhis.dependent","input":[[{"pub":11595147.914317787,"fin":6712980.371447139,"taxBase":335649018.572357},{"pub":0,"fin":0,"taxBase":0}],{"k":1.6386164402903942}],"expect":{"ok":false},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 nhDependentOk"},
+    {"fn":"nhis.dependent","input":[[{"pub":9990000,"fin":0,"taxBase":600000000}],{"k":1}],"expect":{"ok":true},"source":"D","exact":true,"note":"회귀값(정답 아님) — retire-drawdown cce55d9 nhDependentOk"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[14400000,20000000],"otherIncome":0,"age":64}],"expect":{"total":2589400},"source":"D","exact":true,"note":"회귀값(정답 아님) — pension-tax-sim f9d340e comprehensiveTax"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[6000000,12000000],"otherIncome":30000000,"age":72}],"expect":{"total":4939000},"source":"D","exact":true,"note":"회귀값(정답 아님) — pension-tax-sim f9d340e comprehensiveTax"},
+    {"fn":"incomeTax.comprehensive","input":[{"pension":[0,15000001],"otherIncome":1234567,"age":81}],"expect":{"total":407081.48140000005},"source":"D","exact":true,"note":"회귀값(정답 아님) — pension-tax-sim f9d340e comprehensiveTax"},
+    {"fn":"nhis.regional","input":[{"pub":[21600000,7300000],"fin":[15000000,9000000],"other":4000000,"taxBase":440000000}],"expect":{"income":33450000,"incPrem":200420,"propPrem":149310,"health":349730,"ltc":45950,"total":395680,"floor":false},"source":"D","exact":true,"note":"회귀값(정답 아님) — pension-tax-sim f9d340e nhRegional"},
+    {"fn":"finIncome.tax","input":[{"interest":12000000,"divGU":25000000,"divOther":8000000,"otherBase":32000000}],"expect":{"base":79500000,"calc":11320000,"dc":1480000,"decided":9770000,"extra":0,"extraTotal":0},"source":"D","exact":true,"note":"회귀값(정답 아님) — fin-income-tax eb1ac13 finTax"},
+    {"fn":"finIncome.tax","input":[{"divGU":120000000,"otherBase":0}],"expect":{"base":128500000,"calc":25335000,"dc":8535000,"decided":16730000,"extra":0,"extraTotal":0},"source":"D","exact":true,"note":"회귀값(정답 아님) — fin-income-tax eb1ac13 finTax"},
+    {"fn":"finIncome.tax","input":[{"interest":21000000,"otherBase":400000000,"hasWage":true}],"expect":{"base":421000000,"calc":137260000,"dc":0,"decided":137260000,"extra":259999.99999999953,"extraTotal":285999.9999999995},"source":"D","exact":true,"note":"회귀값(정답 아님) — fin-income-tax eb1ac13 finTax"},
+    {"fn":"nhis.employeeExtra","input":[{"fin":34000000,"biz":5000000,"wage":10000000,"pension":20000000}],"expect":{"m":3195652.173913044,"health":229760,"ltc":30190,"annual":3119400},"source":"D","exact":true,"note":"회귀값(정답 아님) — fin-income-tax eb1ac13 nhisCalc('work')"}
+  ]
+}
