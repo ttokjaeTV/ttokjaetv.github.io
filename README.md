@@ -41,6 +41,19 @@
   - 패널 전체: `data-member="라벨"` / 버튼·탭: `data-member-click="라벨"` / 코드 안 제한: `if (window.TJLock && !TJLock.allow('라벨')) return;`
 - 무료·멤버십 나눔 기준은 "투자 Tool 무료·멤버십 나눔안" 문서(2026-10-18). 비교표·트래커 5종과 배당 재투자 계산기(rediv)는 당분간 전부 무료라 표시하지 않았고, 하락장 물타기 계산기는 표현 수정 결정 전이라 빠져 있다.
 
+## profile-v1.js (내 정보 이어쓰기 — 멤버십 기능, 2026-10-23)
+- 나이·은퇴 나이·생활비·자산·국민연금처럼 노후 계산기 여러 곳이 같이 묻는 값을 **한 번만 넣게** 하는 공용 스크립트. 한 계산기에서 손으로 넣은 값을 이 브라우저 `localStorage['tj-profile-v1']`에 저장하고, 다른 계산기를 열면 그 값으로 미리 채운다. 서버로는 보내지 않는다(모든 계산기가 `ttokjaetv.github.io` 한 주소라 저장소를 같이 쓴다).
+- **멤버십 기능:** `member-lock.js`가 잠겨 있으면(`TJLock.locked()`) 채우기·저장을 하지 않고 안내 띠만 보인다. 계산기는 그대로 다 쓸 수 있다. 지금은 `LOCK.on = false`라 모두에게 열려 있고, 판매를 시작해 스위치를 켜면 다른 멤버십 기능과 함께 잠긴다. 회원 판정이 늦게 끝나면(`tjlock-change`) 그때 채운다. 비회원 화면 미리 보기는 `?lock=preview`.
+- 붙은 계산기 8곳: retire-check · retire-drawdown · retirement · goal-calc · freedom · human-capital · nps-calc · pension-tax-sim. 국민연금 계산기는 계산한 월 연금액·시작 나이를 '이 결과를 내 정보에 저장' 버튼으로 넘긴다.
+- **배포 후 고치지 않는다.** 바꿀 일이 생기면 `profile-v2.js`로 낸다(calc-v*.js와 같은 정책).
+- 계산기에 붙이는 법(자세한 설명은 파일 머리말):
+  1. `<head>`에 `member-lock.js` 다음 줄로 `<script src="https://ttokjaetv.github.io/profile-v1.js"></script>` (첫 주소의 ?쿼리를 계산기가 바꾸기 전에 기억해야 해서 계산기 스크립트보다 먼저)
+  2. 띠를 넣을 자리 `<div id="tj-profile"></div>`
+  3. 계산기 시작 코드 끝에 `if (window.TJProfile) TJProfile.attach({ map: { '입력칸 id': '항목' } })`
+- 규칙: 사용자가 그 칸을 직접 고칠 때만 저장(예시 숫자·공유 링크 값은 저장 안 함) · 주소에 공유 링크 값이 있으면 채우지 않고 '내 정보로 채우기' 버튼만 · '예시 숫자로 보기'는 이번 방문 동안 그 페이지만 · 띠의 '내 정보 보기' 창에서 값 고치기·지우기·저장 끄기.
+- 항목·계산 규칙: 금융자산 합계(`fin`)는 연금저축+IRP+ISA+일반(퇴직금 제외), 세액공제 받은 원금·수익(`tc`)은 연금저축+IRP−세액공제 안 받은 원금이고, 계산기에서 합계를 직접 넣으면 더 최근 쪽을 쓴다. 은퇴 기간 = 계획 나이 − 은퇴 나이 + 1. 나이는 올해 − 출생연도.
+- 시험: `node tests/profile-test.js` (허브 CI에서도 돈다).
+
 ## rules/ (계산기 공용 제도 상수, 2026-10-19 · 계산기 이관 전)
 - 세금·건보료·연금·국민연금·매매비용 요율·한도·구간표만 모은 단일 출처. 계산기는 `<script src="https://ttokjaetv.github.io/rules/v2026.1/rules.js"></script>` 를 자기 스크립트보다 먼저 넣고 `TTOKJAE_RULES.NHIS.healthRate` 처럼 읽는다(전역은 `TTOKJAE_RULES` 하나).
 - **배포한 버전 폴더(`rules/v2026.1/`)는 고치지 않는다.** 값이 바뀌면 `v2026.2`·`v2027.1` 새 폴더를 내고 계산기가 버전 번호를 올린다.

@@ -29,6 +29,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: profile-v1.js 시험 (내 정보 이어쓰기)
+        run: node tests/profile-test.js
+
       - name: fill-v1.js 시험
         run: |
           for f in rules/v*/rules.js; do node rules/tests/fill-test.js --rules "$f" || exit 1; done
