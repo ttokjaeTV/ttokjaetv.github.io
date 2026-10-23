@@ -18,7 +18,8 @@
 | `rules/fill-v1.js` | 정적 HTML 설명 문구의 숫자를 rules 값으로 채우는 도우미(`data-rule` 속성). 계산은 안 하고 글자만 바꿈. 배포 후 고치지 않음(바꿀 일이 생기면 `fill-v2.js`) |
 | `rules/tests/fill-test.js` | fill-v1.js 식 계산·표시 형식 시험 |
 | `rules/calc-v1.js` | 공용 계산 엔진(전역 `TTOKJAE_CALC`, `TTOKJAE_CALC.bind(TTOKJAE_RULES)`): 누진세·연금소득공제·종합과세·퇴직소득세·연금 인출 과세·건보료·피부양자·금융소득종합과세·해외주식 양도세·거래세·호가·국민연금 개시 나이. rules v2026.2 이상 필요. 배포 후 고치지 않음(바꿀 일이 생기면 `calc-v2.js`) |
-| `rules/tests/calc-test.js`, `rules/tests/calc-cases/*.json` | calc-v1.js 기준 답안 시험(법령 손계산·공개 예시·회귀값) + 구조 시험 |
+| `rules/calc-v2.js` | calc-v1과 같고 `finIncome.tax`의 표준세액공제에 소득세법 제61조② 한도(공제기준산출세액)를 넣음(2026-10-23). 새로 쓰는 계산기는 v2 |
+| `rules/tests/calc-test.js`, `rules/tests/calc-cases/*.json` | calc-v*.js 기준 답안 시험(엔진 파일마다 따로 실행, 케이스의 `calc: ["calc-v1"]`은 그 엔진에서만)(법령 손계산·공개 예시·회귀값) + 구조 시험 |
 | `rules/tests/calc-compare.js` | calc-v1.js ↔ 계산기 기존 구현(git HEAD) 무작위·경계값 비교 (계산기 clone 필요, 계산기를 엔진으로 옮기기 전에 돌림) |
 | `rules/tools/check-immutable.js` | 배포한 `rules/v*/`·`fill-v*.js`·`calc-v*.js`가 수정·삭제되지 않았는지 (허브 CI) |
 | `.github/workflows/hub-check.yml` | 허브 자동 검사(push·PR): fill 시험, calc 시험, rules.js 자체 일관성, calc 하드코딩, 불변 검사 |
@@ -128,7 +129,9 @@ TTOKJAE_RULES
 | TC `KR_TAX` / `TAF_MAX` / `DEF.sec`·`DEF.taf` / `krTick()` | `TRADE.securitiesTransactionTax` / `tafMaxUsd` / `secFeePerMillionUsd`·`tafPerShareUsd` / `krxTick`·`krxEtfTick` |
 | 물가 기본값 2.5 | `MARKET_DEFAULTS.inflation` (× 100) |
 
-## 공용 계산 엔진 (`calc-v1.js`)
+## 공용 계산 엔진 (`calc-v1.js` · `calc-v2.js`)
+
+> **calc-v2 (2026-10-23)**: calc-v1과 함수·필드가 같고 `finIncome.tax` 하나만 다릅니다. 근로소득 없는 종합소득자의 표준세액공제(제59조의4⑨)를 소득세법 제61조②·시행령 제119조의3②의 **공제기준산출세액**(산출세액 − 산출세액 × 제62조로 원천징수세율을 적용받는 이자·배당소득금액 ÷ 종합소득금액) 안에서만 뺍니다. 비교과세 B(이자·배당 전부 원천징수세율)가 고르고 다른 소득이 없으면 공제 0 → 5월 환급 없음. 결과에 `capBase`(공제기준산출세액) 필드 추가. 아래 설명의 calc-v1은 v2에도 그대로 해당합니다.
 
 rules.js가 숫자만 들고 있다면, calc-v1.js는 그 숫자로 하는 **법에 정해진 계산**(세액·공제·건보료·한도·호가)을 한 곳에 둡니다.
 계산기마다 같은 식을 따로 적어 두던 것(누진세 표 돌기, 연금소득공제, 퇴직소득세, 건보료 10원 버림 …)을 이 함수로 부르면 식이 하나가 됩니다.
@@ -136,7 +139,7 @@ rules.js가 숫자만 들고 있다면, calc-v1.js는 그 숫자로 하는 **법
 ```html
 <script src="https://ttokjaetv.github.io/rules/v2026.2/rules.js"></script>
 <script src="https://ttokjaetv.github.io/rules/fill-v1.js"></script>
-<script src="https://ttokjaetv.github.io/rules/calc-v1.js"></script>   <!-- rules.js 다음, 계산기 엔진보다 먼저 -->
+<script src="https://ttokjaetv.github.io/rules/calc-v2.js"></script>   <!-- rules.js 다음, 계산기 엔진보다 먼저 -->
 <script>
 if (!window.TTOKJAE_RULES || !window.TTOKJAE_CALC) {
   var TJR_MSG = !window.TTOKJAE_RULES ? '기준값 파일(rules.js)을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요.'
@@ -182,7 +185,7 @@ CALC.retirementTax.calc(3e8, 30).national      // 9,862,500
 | `nhis.regional({pub, wage, fin, other, taxBase, k, trunc})` | `{income, m, incPrem, pts, propPrem, health, ltc, total, floor, atCap}` | 공적연금·근로 50%, 금융 1인별 1,000만 판정(엔진이 거름), 소득분·재산분 각각 버림 → 장기요양 다시 버림 |
 | `nhis.employeeExtra({fin, biz, wage, pension, trunc})` | `{S, ev, m, health, ltc, monthly, annual, atFloor, atCap}` | 직장가입자 보수 외 소득 2,000만 초과분 |
 | `nhis.dependent(people, {k})` | `{people: [{inc, biz, bizReg, tb, bizOk, incOk, propOk, ok}], incAll, ok}` | 사람 `{pub, wage, fin, other(사업소득), bizReg, taxBase}`. 소득 요건 부부 함께, 재산 각자. 기준 금액 ÷k |
-| `finIncome.tax({interest, divGU, divOther, otherBase, hasWage, year})` | fin-income-tax `finTax`와 같은 필드(`extra`, `extraTotal`, `A`, `B`, `gu`, `dc`, `stdc` …) | 그로스업율 `grossUpByYear[year]`(기본 `meta.year`, 표 밖이면 가까운 끝 해) |
+| `finIncome.tax({interest, divGU, divOther, otherBase, hasWage, year})` | fin-income-tax `finTax`와 같은 필드(`extra`, `extraTotal`, `A`, `B`, `gu`, `dc`, `stdc` …, v2는 `capBase` 추가). v2: `stdc` ≤ 공제기준산출세액(제61조②) | 그로스업율 `grossUpByYear[year]`(기본 `meta.year`, 표 밖이면 가까운 끝 해) |
 | `overseasStock.tax(gain, {otherGain, riaDeduction, roundWon, incremental})` | `{base, national, local, tax}` (`incremental`이면 `{tax}`) | `roundWon`: 원 단위 반올림·원 미만 버림(overseas-stock-tax). `incremental`: otherGain 위에 gain을 더해 늘어나는 세액(etf-vs-direct) |
 | `trade.tick(kind, price)` | 호가 단위 | `'krx'`(기본)·`'etf'`·`'us'` |
 | `trade.krSellTax(amount, market, {floor})` | `{stt, rural, tax}` | `market`: kospi·kosdaq·konex·etf. 기본 원 미만 버림 |
@@ -283,6 +286,6 @@ node rules/tools/check-immutable.js <기준 커밋> [<대상 커밋>]           
 
 - 지역 건보 하한: 20,160 ÷ 7.19% = 280,389원이라 소득월액 28만~28.04만 구간은 `max(하한, 소득월액 × 요율)` 가드가 필요(FIT·EVD·PTS·RDD 모두 2026-10-19 기준 반영, 새 계산기도 같은 가드를 둘 것).
 - 10원 미만 절사: 2026-10-20부터 FIT·EVD·PTS·RDD 모두 적용(소득분·재산분 각각, 장기요양은 버린 건강보험료 기준으로 다시 버림). calc-v1 `nhis.*`의 기본값.
-- 표준세액공제 7만원: 2026-10-20부터 PTS·RDD·FIT·EVD 모두 차감(근로소득 없는 경우). calc-v1 `incomeTax.comprehensive`·`finIncome.tax`의 기본값.
+- 표준세액공제 7만원: 2026-10-20부터 PTS·RDD·FIT·EVD 모두 차감(근로소득 없는 경우). calc-v1 `incomeTax.comprehensive`·`finIncome.tax`의 기본값. 2026-10-23부터 FIT·EVD는 calc-v2로 금융소득종합과세 때 제61조② 한도 적용(B가 고르고 다른 소득이 없으면 0).
 - 세액공제율 기본 선택값: isa-maturity 13.2%, retire-check 16.5%.
 - trading-cost는 코넥스를 선택지에 두지 않음(rules에는 `konex` 있음).

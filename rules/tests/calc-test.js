@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /*
- * calc-v1.js 기준 답안 시험:  node rules/tests/calc-test.js [--rules rules/v2026.2/rules.js] [--verbose]
+ * calc-v*.js 기준 답안 시험:  node rules/tests/calc-test.js [--calc rules/calc-v2.js] [--rules rules/v2026.2/rules.js] [--verbose]
  *
+ * --calc 없이 돌리면 rules/calc-v*.js 전부를 하나씩(따로 실행) 시험한다.
  * --rules 없이 돌리면 rules/v<버전>/rules.js 중 v2026.2 이상 전부를 차례로 시험하고, 그보다 옛 버전은 bind가 거부하는지만 본다.
  *
  * 1) 기준 답안: rules/tests/calc-cases/*.json
@@ -11,6 +12,7 @@
  *      source : A 법령 손계산(식은 note) · B 공식 모의계산 · C 금융사 공개 예시 · D 현재 계산기 출력 회귀값(정답 아님)
  *      tol    : 숫자 허용 오차(원, 기본 1e-6 — 손계산 값과 부동소수 끝자리 차이만 허용). exact: true면 Object.is로 비교.
  *      year   : rules meta.year가 다르면 그 파일은 건너뜀(그해 법령 값으로 손계산한 답이므로).
+ *      calc   : ["calc-v1"]처럼 적으면 그 엔진에서만 시험(엔진 버전 사이에 계산 방식이 바뀐 답). 없으면 모든 엔진.
  * 2) 구조 시험: 전역 이름, 얼림, 필요한 키가 빠지면 오류, 금지 API(DOM·fetch·Date·console) 미사용, 누진세·공제 연속성.
  */
 'use strict';
@@ -19,7 +21,20 @@ const argv = process.argv.slice(2);
 const ri = argv.indexOf('--rules');
 const VERBOSE = argv.includes('--verbose');
 const RULES_DIR = path.join(__dirname, '..');
-const ENGINE = path.join(RULES_DIR, 'calc-v1.js');
+const ci = argv.indexOf('--calc');
+if (ci < 0) {
+  // 엔진 파일마다 따로 실행(전역·require 캐시가 섞이지 않게)
+  const { spawnSync } = require('child_process');
+  const engines = fs.readdirSync(RULES_DIR).filter(f => /^calc-v\d+\.js$/.test(f)).sort((a, b) => parseInt(a.slice(6)) - parseInt(b.slice(6)));
+  let failed = 0;
+  for (const e of engines) {
+    const r = spawnSync(process.execPath, [__filename, '--calc', path.join(RULES_DIR, e), ...argv], { stdio: 'inherit' });
+    if (r.status !== 0) failed++;
+  }
+  process.exit(failed ? 1 : 0);
+}
+const ENGINE = path.resolve(argv[ci + 1]);
+const NAME = path.basename(ENGINE, '.js');
 const SRC = fs.readFileSync(ENGINE, 'utf8');
 const ENG = require(ENGINE);
 const verNum = v => { const m = /^(\d+)\.(\d+)$/.exec(String(v)); return m ? +m[1] * 1000 + +m[2] : -1; };
@@ -42,8 +57,8 @@ const ok = (cond, msg) => { total++; if (!cond) fail(msg); else if (VERBOSE) con
   vm.runInContext(SRC, ctx);
   const added = Object.getOwnPropertyNames(vm.runInContext('globalThis', ctx)).filter(k => !before.has(k));
   ok(added.length === 1 && added[0] === 'TTOKJAE_CALC', '브라우저 전역은 TTOKJAE_CALC 하나 (생긴 이름: ' + added.join(', ') + ')');
-  ok(vm.runInContext('TTOKJAE_CALC.version', ctx) === 'calc-v1', 'TTOKJAE_CALC.version = calc-v1');
-  ok(ENG.version === 'calc-v1' && typeof ENG.bind === 'function' && Object.isFrozen(ENG), 'Node module.exports = { version, bind } (얼림)');
+  ok(vm.runInContext('TTOKJAE_CALC.version', ctx) === NAME, 'TTOKJAE_CALC.version = ' + NAME);
+  ok(ENG.version === NAME && typeof ENG.bind === 'function' && Object.isFrozen(ENG), 'Node module.exports = { version, bind } (얼림)');
   // 금지 API (주석·문자열 밖 코드에서)
   const code = SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').replace(/'(?:[^'\\\n]|\\.)*'/g, "''");
   for (const [re, name] of [[/\bdocument\b/, 'document'], [/\bfetch\s*\(/, 'fetch'], [/\bDate\b/, 'Date'], [/\bconsole\b/, 'console'], [/\bXMLHttpRequest\b/, 'XMLHttpRequest'], [/\blocalStorage\b/, 'localStorage'], [/\bTTOKJAE_RULES\b/, '전역 TTOKJAE_RULES 직접 참조']])
@@ -121,6 +136,7 @@ for (const file of targets) {
     const list = Array.isArray(data) ? data : data.cases;
     if (!Array.isArray(data) && data.year != null && data.year !== R.meta.year) { skipped += list.length; continue; }
     list.forEach((c, i) => {
+      if (c.calc && !c.calc.includes(NAME)) { skipped++; return; }
       n++; total++;
       bySrc[c.source] = (bySrc[c.source] || 0) + 1;
       const f = fnAt(C, c.fn);
@@ -132,8 +148,8 @@ for (const file of targets) {
       else if (VERBOSE) console.log(`ok   v${ver} ${cf}#${i + 1} [${c.source}] ${c.fn}`);
     });
   }
-  summary.push(`rules v${ver}: 기준 답안 ${n}건 (A ${bySrc.A} · B ${bySrc.B} · C ${bySrc.C} · D ${bySrc.D})${skipped ? ` · 다른 연도라 건너뜀 ${skipped}` : ''} — ${nBad ? '실패 ' + nBad : '통과'}`);
+  summary.push(`${NAME} · rules v${ver}: 기준 답안 ${n}건 (A ${bySrc.A} · B ${bySrc.B} · C ${bySrc.C} · D ${bySrc.D})${skipped ? ` · 다른 연도·다른 엔진용이라 건너뜀 ${skipped}` : ''} — ${nBad ? '실패 ' + nBad : '통과'}`);
 }
 summary.forEach(s => console.log(s));
-console.log(`calc-v1 시험 ${total}건 — ${bad ? '실패 ' + bad : '모두 통과'}`);
+console.log(`${NAME} 시험 ${total}건 — ${bad ? '실패 ' + bad : '모두 통과'}`);
 process.exit(bad ? 1 : 0);

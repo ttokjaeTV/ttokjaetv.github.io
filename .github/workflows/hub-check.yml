@@ -1,6 +1,6 @@
 # 허브 자체 자동 검사 — 공용 기준값(rules)·채움 도우미(fill)·계산 엔진(calc)을 고칠 때마다 돈다.
 #  1. fill-v1.js 시험 (설치된 rules 버전 전부)
-#  2. calc-v1.js 기준 답안 시험 (v2026.2 이상 rules 버전 전부, 옛 버전은 bind 거부 확인)
+#  2. calc-v*.js 기준 답안 시험 (v2026.2 이상 rules 버전 전부, 옛 버전은 bind 거부 확인)
 #  3. rules.js 자체 일관성 (국세×1.1 = 지방세 포함 세율, 누진공제·공제표 연속성, 60등급, 동결) — 버전 전부
 #  4. 공용 엔진(calc-v*.js)에 제도 숫자 하드코딩 없음
 #  5. 불변 검사: 이미 커밋돼 있던 rules/v*/ 파일, rules/fill-v*.js, rules/calc-v*.js가 이번 push·PR에서 수정·삭제되면 실패 (새 파일 추가는 허용)
@@ -33,7 +33,7 @@ jobs:
         run: |
           for f in rules/v*/rules.js; do node rules/tests/fill-test.js --rules "$f" || exit 1; done
 
-      - name: calc-v1.js 기준 답안 시험
+      - name: calc-v*.js 기준 답안 시험 (엔진 파일마다)
         run: node rules/tests/calc-test.js
 
       - name: rules.js 자체 일관성
