@@ -360,6 +360,8 @@ const self = [
   ['연금소득공제 누적 연속성', R.INCOME_TAX.pensionIncomeDeduction.map(r => r[3]), R.INCOME_TAX.pensionIncomeDeduction.map((r, i, a) => (i === 0 ? 0 : a[i - 1][3] + (a[i - 1][0] - a[i - 1][2]) * a[i - 1][1]))],
   ['환산급여공제 누적 연속성', R.RETIREMENT_INCOME_TAX.convertedPayDeduction.map(r => r[3]), R.RETIREMENT_INCOME_TAX.convertedPayDeduction.map((r, i, a) => (i === 0 ? 0 : a[i - 1][3] + (a[i - 1][0] - a[i - 1][2]) * a[i - 1][1]))],
   ['근속연수공제 누적 연속성', R.RETIREMENT_INCOME_TAX.serviceYearDeduction.map(r => r[3]), R.RETIREMENT_INCOME_TAX.serviceYearDeduction.map((r, i, a) => (i === 0 ? 0 : a[i - 1][3] + (a[i - 1][0] - a[i - 1][2]) * a[i - 1][1]))],
+  ...(R.GIFT ? [['GIFT.brackets 누진공제 연속성', R.GIFT.brackets.slice(1).map(([, r, d]) => d), R.GIFT.brackets.slice(1).map(([, r], i) => {
+    const [lim0, r0, d0] = R.GIFT.brackets[i]; return Math.round(lim0 * r - (lim0 * r0 - d0)); })]] : []),
   ['TTOKJAE_RULES 동결(deep freeze)', Object.isFrozen(R) && Object.isFrozen(R.NHIS.propertyPointTable[0]) && Object.isFrozen(R.TRADE.securitiesTransactionTax.kospi), true],
 ];
 for (const [label, a, b] of self) {

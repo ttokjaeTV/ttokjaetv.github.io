@@ -11,7 +11,7 @@
 
 | 경로 | 내용 |
 |---|---|
-| `rules/v2026.1/rules.js`, `rules/v2026.2/rules.js` | 상수 본체(최신 v2026.2 = v2026.1 + 키 추가, 값 변경 없음). 브라우저에서는 전역 `TTOKJAE_RULES` 하나만 만들고, Node에서는 `module.exports`. 깊게 얼려(deep freeze) 있어 실수로 값을 바꿀 수 없음 |
+| `rules/v2026.1/rules.js`, `rules/v2026.2/rules.js`, `rules/v2026.3/rules.js` | 상수 본체(최신 v2026.3 = v2026.2 + 증여세 `GIFT` 추가, 값 변경 없음). 브라우저에서는 전역 `TTOKJAE_RULES` 하나만 만들고, Node에서는 `module.exports`. 깊게 얼려(deep freeze) 있어 실수로 값을 바꿀 수 없음 |
 | `rules/CHANGELOG.md` | 버전별 바뀐 값 |
 | `rules/tests/check-values.js` | rules.js의 모든 값을 계산기 clone의 코드 값과 대조(표 출력, 불일치 시 종료 코드 1) |
 | `rules/tools/scan-hardcoded.js` | 계산기 코드에 rules.js 값이 숫자로 박혀 있는 곳을 file:line으로 나열(이관 검증·회귀 감시) |
@@ -44,6 +44,8 @@ TTOKJAE_RULES
 ├─ PENSION_SAVINGS    creditRateHigh/Low, 기준 소득, creditLimitPensionSavings 600만, creditLimitTotal 900만,
 │                     contributionLimit 1,800만, isaTransferCreditRate 0.1, isaTransferCreditCap 300만, irpRiskAssetLimit 0.7
 ├─ ISA                annualLimit, totalLimit, taxFreeGeneral, taxFreePreferential, excessRate, minHoldingYears
+├─ GIFT               (v2026.3~) deductionSpouse·deductionLineal·deductionLinealMinor·deductionDescendant·deductionRelative, periodYears 10, minorAgeUnder 19,
+│                     marriageBirthDeduction 1억, brackets [[상한, 세율, 누진공제]…], minTaxBase, filingCreditRate, generationSkipSurcharge(·MinorLarge·LargeThreshold)
 ├─ NPS                A, aYear, bWeightUntilYear·bWeightOld(v2026.2~, 1998년 이전 B 0.75), incomeFloorMonthly, incomeCapMonthly, premiumRateByYear{2025..2033}, employeeShareRatio,
 │                     alphaByYear{1988..2026}, startAgeByBirthYear, earlyReductionPerYear, maxEarlyYears,
 │                     deferralBonusPerYear, maxDeferralYears, familyBenefitSpouseMonthly, familyBenefitOtherMonthly,
